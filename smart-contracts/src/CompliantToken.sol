@@ -36,6 +36,13 @@ contract CompliantToken is ERC20, AccessControl {
         whitelist = IGlobalWhitelist(whitelistAddress);
 
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
+        _grantRole(MINTER_ROLE, defaultAdmin);
+        _grantRole(COMPLIANCE_ROLE, defaultAdmin);
+        
+        // If the deployer (e.g. Treasury) is different from the admin, it also needs to mint.
+        if (msg.sender != defaultAdmin) {
+            _grantRole(MINTER_ROLE, msg.sender);
+        }
     }
 
     function decimals() public view override returns (uint8) {

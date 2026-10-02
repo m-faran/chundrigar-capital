@@ -48,10 +48,8 @@ contract Treasury is Ownable, ReentrancyGuard {
      */
     function deployToken(string memory name, string memory symbol) external onlyOwner returns (address) {
         // Deploy with 18 decimals
+        // The CompliantToken constructor automatically grants MINTER_ROLE to msg.sender (Treasury)
         CompliantToken newToken = new CompliantToken(name, symbol, 18, whitelist, owner());
-
-        // Grant Treasury the MINTER_ROLE (which also handles burns for sales)
-        newToken.grantRole(newToken.MINTER_ROLE(), address(this));
 
         isPSXToken[address(newToken)] = true;
         emit TokenDeployed(address(newToken), symbol);
