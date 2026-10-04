@@ -80,10 +80,11 @@ app.get('/api/quote', async (req, res) => {
         const deadline = BigInt(Math.floor(Date.now() / 1000) + 300);
 
         // 4. Create Message Hash mimicking Solidity's keccak256(abi.encodePacked(...))
+        const chain_id = baseSepolia.id;
         const messageHash = keccak256(
             encodePacked(
-                ['string', 'address', 'address', 'uint256', 'uint256', 'uint256', 'uint256', 'address'],
-                [action.toUpperCase(), token, paymentToken, BigInt(amount), paymentAmount, deadline, nonce, userAddress]
+                ['string', 'uint256', 'address', 'address', 'address', 'uint256', 'uint256', 'uint256', 'uint256', 'address'],
+                [action.toUpperCase(), BigInt(chain_id), treasuryAddress, token, paymentToken, BigInt(amount), paymentAmount, deadline, nonce, userAddress]
             )
         );
 

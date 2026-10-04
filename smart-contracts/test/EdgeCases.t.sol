@@ -39,6 +39,7 @@ contract EdgeCasesTest is Test {
         paymentToken = new MockPaymentToken();
         
         treasury = new Treasury(signer, address(whitelist), feeReceiver, address(this));
+        treasury.setAllowedPaymentToken(address(paymentToken), true);
         
         // Deploy a PSX token via Treasury
         address tokenAddr = treasury.deployToken("OGDC Stock", "OGDC");
@@ -269,5 +270,84 @@ contract EdgeCasesTest is Test {
         vm.prank(user);
         vm.expectRevert();
         psxToken.freeze(user, 100);
+    }
+
+    function test_Bug_FrozenBalanceUnderflowDOS() public {
+        // Step 1: User gets 100 tokens
+        uint256 amount = 100 * 10**18;
+        uint256 paymentAmount = 100 * 10**6;
+        
+        bytes memory sig = _signTrade("BUY", address(psxToken), address(paymentToken), amount, paymentAmount, block.timestamp + 60, 0, user, signerPrivateKey);
+        vm.prank(user);
+        treasury.buy(address(psxToken), address(paymentToken), amount, paymentAmount, block.timestamp + 60, 0, sig);
+
+        assertEq(psxToken.balanceOf(user), amount);
+        
+        // Step 2: Admin freezes all 100 tokens
+        psxToken.freeze(user, amount);
+        
+        // Step 3: Admin forces a transfer of 50 tokens (seizure)
+        // This bypasses the freeze check in _update but reduces the user's balance to 50
+        // while leaving frozenBalances[user] at 100.
+        psxToken.forceTransfer(user, unwhitelistedUser, 50 * 10**18);
+        
+        assertEq(psxToken.balanceOf(user), 50 * 10**18);
+        assertEq(psxToken.frozenBalances(user), 100 * 10**18);
+        
+        // Step 4: The underflow DOS occurs.
+        // Even if the user tries to transfer 0 tokens, or receives tokens and then tries to transfer,
+        // it reverts due to panic (arithmetic underflow) instead of a graceful require message,
+        // because `balanceOf(from) - frozenBalances[from]` is evaluated BEFORE the require check.
+        // 50 - 100 underflows.
+        
+        // Expect a Panic error (0x11 is panic for underflow/overflow)
+        vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
+        vm.prank(user);
+        psxToken.transfer(address(0x444), 0);
+    }
+
+    function test_Lead_SharedPoolInsolvency() public {
+        // Step 1: User 1 and User 2 both buy 100 shares of stock when price is $1 per share.
+        // The Treasury will hold $200 total in the payment token pool.
+        address user2 = address(0x999);
+        whitelist.setWhitelist(user2, true);
+        paymentToken.mint(user2, 10_000 * 10**6);
+        
+        vm.prank(user2);
+        paymentToken.approve(address(treasury), type(uint256).max);
+
+        uint256 amount = 100 * 10**18;
+        uint256 paymentAmount = 100 * 10**6; // $100
+
+        bytes memory sig1 = _signTrade("BUY", address(psxToken), address(paymentToken), amount, paymentAmount, block.timestamp + 60, 0, user, signerPrivateKey);
+        vm.prank(user);
+        treasury.buy(address(psxToken), address(paymentToken), amount, paymentAmount, block.timestamp + 60, 0, sig1);
+
+        bytes memory sig2 = _signTrade("BUY", address(psxToken), address(paymentToken), amount, paymentAmount, block.timestamp + 60, 0, user2, signerPrivateKey);
+        vm.prank(user2);
+        treasury.buy(address(psxToken), address(paymentToken), amount, paymentAmount, block.timestamp + 60, 0, sig2);
+
+        // Treasury now has $200 (minus fees, but let's ignore fees for the principal pool mechanic)
+        // Wait, fees were paid on top. User paid $100 + $0.50 fee. Treasury kept $100, fee receiver got $0.50.
+        // Treasury balance of USDC is exactly $200.
+        
+        // Step 2: The stock price 3x's. It's now $3 per share.
+        // User 1 sells their 100 shares for $300.
+        uint256 sellPaymentAmount = 300 * 10**6; 
+        bytes memory sigSell1 = _signTrade("SELL", address(psxToken), address(paymentToken), amount, sellPaymentAmount, block.timestamp + 60, 1, user, signerPrivateKey);
+        
+        // Wait, the Treasury only has $200. User 1's sell transaction will REVERT due to insolvency.
+        vm.prank(user);
+        vm.expectRevert(); // SafeERC20: ERC20 operation did not succeed (or insufficient balance)
+        treasury.sell(address(psxToken), address(paymentToken), amount, sellPaymentAmount, block.timestamp + 60, 1, sigSell1);
+    }
+
+    function test_Lead_ForceTransferZeroAddressIsFalsePositive() public {
+        // The audit report claims forceTransfer(address(0)) mints tokens.
+        // Let's prove it reverts due to OpenZeppelin ERC20 v5 _transfer() checks.
+        
+        // We expect ERC20InvalidSender(address(0))
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256("ERC20InvalidSender(address)")), address(0)));
+        psxToken.forceTransfer(address(0), user, 100 * 10**18);
     }
 }

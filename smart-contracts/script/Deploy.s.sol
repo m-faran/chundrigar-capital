@@ -41,6 +41,9 @@ contract DeployScript is Script {
         // Whitelist the Treasury contract so it can hold and route CompliantTokens (like SPKR)
         whitelist.setWhitelist(address(treasury), true);
 
+        // Explicitly whitelist the feeReceiver (which is deployerAddress) so fee routing doesn't revert
+        whitelist.setWhitelist(deployerAddress, true);
+
         // Note: PSX tokens will now be deployed dynamically from the frontend by the admin.
         
         vm.stopBroadcast();

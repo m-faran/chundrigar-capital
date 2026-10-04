@@ -64,6 +64,7 @@ contract CompliantToken is ERC20, AccessControl {
 
     // --- Compliance ---
     function freeze(address account, uint256 amount) external onlyRole(COMPLIANCE_ROLE) {
+        require(frozenBalances[account] + amount <= balanceOf(account), "Cannot freeze more than balance");
         frozenBalances[account] += amount;
         emit Frozen(account, amount);
     }
@@ -78,6 +79,9 @@ contract CompliantToken is ERC20, AccessControl {
         _isComplianceBypass = true;
         _transfer(from, to, amount);
         _isComplianceBypass = false;
+        if (frozenBalances[from] > balanceOf(from)) {
+            frozenBalances[from] = balanceOf(from);
+        }
         emit ForceTransfer(from, to, amount);
     }
 
@@ -85,6 +89,9 @@ contract CompliantToken is ERC20, AccessControl {
         _isComplianceBypass = true;
         _burn(from, amount);
         _isComplianceBypass = false;
+        if (frozenBalances[from] > balanceOf(from)) {
+            frozenBalances[from] = balanceOf(from);
+        }
     }
 
     // --- Core Overrides ---

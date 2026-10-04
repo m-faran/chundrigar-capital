@@ -1,0 +1,5 @@
+name	Chundrigar Capital
+mode	filename
+files	smart-contracts/src/CompliantToken.sol smart-contracts/src/GlobalWhitelist.sol smart-contracts/src/Treasury.sol smart-contracts/script/Deploy.s.sol
+passes_planned	1
+pass_1_agents	12/12
