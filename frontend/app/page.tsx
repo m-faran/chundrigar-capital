@@ -114,7 +114,7 @@ function TradingApp() {
       const amountInWei = parseUnits(amount, 18).toString();
 
       // 1. Fetch Pull Oracle Quote
-      const res = await fetch(`http://localhost:3001/api/quote?action=buy&symbol=${symbol}&token=${psxTokenAddress}&paymentToken=${paymentToken}&amount=${amountInWei}&userAddress=${address}&treasuryAddress=${TREASURY_ADDRESS}`);
+      const res = await fetch(`/api/quote?action=buy&symbol=${symbol}&token=${psxTokenAddress}&paymentToken=${paymentToken}&amount=${amountInWei}&userAddress=${address}&treasuryAddress=${TREASURY_ADDRESS}`);
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
