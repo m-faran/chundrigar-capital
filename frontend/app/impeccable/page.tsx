@@ -103,7 +103,8 @@ export default function ImpeccableLanding() {
         <Link className="cc-wordmark" href="/impeccable">
           Chundrigar&nbsp;Capital
         </Link>
-        <nav className="cc-nav-links" aria-label="Page sections">
+        <nav className="cc-nav-links" aria-label="Site">
+          <Link href="/impeccable/markets">The register</Link>
           <a href="#cc-mechanism">Mechanism</a>
           <a href="#cc-rails">Rails</a>
           <a href="#cc-compliance">Compliance</a>

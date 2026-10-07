@@ -93,9 +93,9 @@ export default function TasteLanding() {
             Chundrigar Capital
           </Link>
           <nav aria-label="Sections" className="ml-2 hidden gap-6 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
+            <Link href="/taste/markets" className="transition-colors hover:text-ink dark:hover:text-night-ink">Markets</Link>
             <a href="#t-mechanism" className="transition-colors hover:text-ink dark:hover:text-night-ink">Mechanism</a>
             <a href="#t-compliance" className="transition-colors hover:text-ink dark:hover:text-night-ink">Compliance</a>
-            <a href="#t-rails" className="transition-colors hover:text-ink dark:hover:text-night-ink">Rails</a>
           </nav>
           <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
             Base Sepolia · TESTNET
