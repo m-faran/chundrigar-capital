@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchPSX } from "../../../lib/api-fetcher";
 import { MarketsClient } from "./markets-client";
+import { ThemeToggle } from "../theme-toggle";
 import "../taste.css";
 
 export const metadata: Metadata = {
@@ -19,6 +20,10 @@ type Member = {
 
 type KseResponse = { data?: Member[]; meta?: { timestamp?: string } };
 
+/* Applies the persisted (or system-default) theme before first paint,
+   so the manual toggle never flashes the wrong mode. */
+const THEME_BOOT = `(function(){try{var s=localStorage.getItem("taste-theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
+
 export default async function TasteMarkets() {
   let members: Member[] | null = null;
   let pulledAt: string | null = null;
@@ -33,19 +38,20 @@ export default async function TasteMarkets() {
 
   return (
     <div className="min-h-[100dvh] bg-paper text-ink dark:bg-night dark:text-night-ink">
+      <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur dark:border-night-line dark:bg-night/90">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 md:px-8">
-          <Link href="/taste" className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
+          <Link href="/taste" className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
             Chundrigar Capital
           </Link>
-          <nav aria-label="Site" className="ml-2 hidden gap-6 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
-            <Link href="/taste" className="transition-colors hover:text-ink dark:hover:text-night-ink">
+          <nav aria-label="Site" className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
+            <Link href="/taste" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">
               Overview
             </Link>
             <Link
               href="/taste/markets"
               aria-current="page"
-              className="text-ink dark:text-night-ink"
+              className="inline-flex items-center rounded-control px-3 py-3 text-ink dark:text-night-ink"
             >
               Markets
             </Link>
@@ -53,16 +59,18 @@ export default async function TasteMarkets() {
           <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
             Base Sepolia · TESTNET
           </span>
+          <ThemeToggle />
           <a
             href="/"
-            className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+            className="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
           >
-            Open the testnet app
+            <span className="sm:hidden">Open app</span>
+            <span className="hidden sm:inline">Open the testnet app</span>
           </a>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5 pb-24 pt-12 md:px-8 md:pt-16">
+      <main className="mx-auto max-w-[1280px] px-5 pb-24 pt-12 md:px-8 md:pt-16">
         <h1 className="max-w-[24ch] text-4xl font-semibold tracking-tight md:text-5xl">
           The KSE 100, as a working list.
         </h1>
@@ -94,7 +102,7 @@ export default async function TasteMarkets() {
       </main>
 
       <footer className="border-t border-line dark:border-night-line">
-        <div className="mx-auto max-w-6xl px-5 py-10 md:px-8">
+        <div className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <p className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
               Chundrigar Capital
@@ -103,7 +111,7 @@ export default async function TasteMarkets() {
               Base Sepolia · TESTNET
             </span>
           </div>
-          <p className="mt-6 max-w-[78ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
+          <p className="mt-6 max-w-[65ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
             Testnet software. Tokens represent simulated inventory during the
             MVP. Nothing here offers returns, yields, dividends, or
             appreciation. Chundrigar Capital is the protocol; tokens issued on

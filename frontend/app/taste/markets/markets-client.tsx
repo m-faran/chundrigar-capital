@@ -52,7 +52,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
           autoComplete="off"
           spellCheck={false}
           aria-describedby="t-search-count"
-          className="mt-2 w-full rounded-control border border-line bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/70 focus:border-accent focus:outline-none dark:border-night-line dark:bg-night-surface dark:text-night-ink dark:placeholder:text-night-ink-soft/70 dark:focus:border-accent-bright"
+          className="mt-2 min-h-[44px] w-full rounded-control border border-line bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-accent focus:outline-none dark:border-night-line dark:bg-night-surface dark:text-night-ink dark:placeholder:text-night-ink-soft dark:focus:border-accent-bright"
         />
       </div>
       <p id="t-search-count" className="t-figs mt-3 text-xs text-ink-soft dark:text-night-ink-soft" role="status">
@@ -89,7 +89,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
                 <td className="px-5 py-3">
                   <Link
                     href={`/taste/markets/${encodeURIComponent(m.symbol)}`}
-                    className="t-figs font-medium text-ink underline-offset-4 hover:underline dark:text-night-ink"
+                    className="t-figs relative font-medium text-ink underline-offset-4 hover:underline after:absolute after:inset-x-0 after:-inset-y-3.5 after:content-[''] dark:text-night-ink"
                   >
                     {m.symbol}
                   </Link>
@@ -125,7 +125,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="mt-4 rounded-control border border-line px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
+              className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-control border border-line bg-transparent px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
             >
               Clear search
             </button>
@@ -138,7 +138,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
           <button
             type="button"
             onClick={() => setLimit((l) => l + PAGE)}
-            className="rounded-control border border-line px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-control border border-line bg-transparent px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
           >
             Show {Math.min(PAGE, filtered.length - visible.length)} more
           </button>

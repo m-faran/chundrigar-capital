@@ -18,8 +18,15 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // suppressHydrationWarning: the taste routes' theme bootstrap script adds a
+  // `dark` class to <html> before hydration; this silences the resulting
+  // attribute-only mismatch warning (same pattern as next-themes).
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

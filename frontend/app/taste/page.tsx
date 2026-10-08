@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Outfit, JetBrains_Mono } from "next/font/google";
 import Ticker from "./ticker";
+import { ThemeToggle } from "./theme-toggle";
 import "./taste.css";
 
 const outfit = Outfit({
@@ -18,8 +19,12 @@ const jbmono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Chundrigar Capital | Pakistan Stock Exchange shares, as tokens",
   description:
-    "A compliance-gated protocol that issues PSX shares as 6-decimal tokens, bought directly from the Treasury at backend-signed prices. Testnet on Base Sepolia.",
+    "Buy KSE-100 shares as tokens on Base Sepolia. Pay in PKR or USDC; tokens mint straight to your wallet at a signed price.",
 };
+
+/* Applies the persisted (or system-default) theme before first paint,
+   so the manual toggle never flashes the wrong mode. */
+const THEME_BOOT = `(function(){try{var s=localStorage.getItem("taste-theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
 
 export const viewport: Viewport = {
   themeColor: [
@@ -28,97 +33,91 @@ export const viewport: Viewport = {
   ],
 };
 
-const ADDRESSES = {
-  whitelist: "0xb090dE63b98b3e58ea1fe4374f20184076c0091A",
-  treasury: "0x2cE43f3854832813f1CF7fba38838F5bA2927E1A",
-  spkr: "0x9B3DD15c5E4Ae4f77d48f2497A8155366a98F546",
-  signer: "0xe8096648905c199769F9A37F4bAf1D5148916DdB",
-};
-
-const short = (a: string) => `${a.slice(0, 6)}...${a.slice(-4)}`;
-
-const PRINCIPLES = [
+const STEPS = [
   {
-    title: "Prices live off-chain",
-    body: "Nothing pays to keep a feed warm. A signer quotes each trade and signs the exact parameters.",
-    span: "md:col-span-2",
-    visual: true,
+    name: "Verify once",
+    body: "Upload an ID for a quick human review. Your wallet joins the whitelist — no repeat checks after that.",
   },
   {
-    title: "The contract checks the signature",
-    body: "Altered, expired, or replayed quotes are rejected on-chain. A price is spendable only as written.",
-    span: "",
-    visual: false,
+    name: "Pick a stock, pay your way",
+    body: "Choose any KSE-100 name and pay in PKR or USDC. You see the exact price before you confirm.",
   },
   {
-    title: "Compliance gates every transfer",
-    body: "The token consults the whitelist itself, on every move, forever.",
-    span: "",
-    visual: true,
-  },
-  {
-    title: "No market maker in the middle",
-    body: "The Treasury is the counterparty. It mints against inventory and burns on exit. Fee: 0.50%.",
-    span: "md:col-span-4",
-    visual: false,
+    name: "Tokens land in your wallet",
+    body: "Shares mint to your wallet at the quoted price. Sell them back the same way, any time.",
   },
 ];
 
-const STEPS = [
+const RAILS = [
   {
-    name: "Quote",
-    body: "You pick a token (say OGDC), a quantity, and a rail. The signer quotes both rails and signs the bundle: token, amount, payment amount, deadline, nonce, your address.",
+    title: "In Pakistan: pay in PKR",
+    body: "The rupee rail prices the market natively — no currency conversion on your trade.",
   },
   {
-    name: "Verify",
-    body: "The Treasury contract recovers the signature and checks every parameter against it. Anything expired or replayed fails here, on-chain.",
+    title: "Abroad: pay in USDC",
+    body: "Your dollars convert at trade time, inside the signed price — not yesterday's rate.",
+  },
+];
+
+const TRUST = [
+  {
+    title: "Signed prices, verified on-chain",
+    body: "Every quote is signed off-chain and checked by the contract. Nothing else settles.",
   },
   {
-    name: "Settle",
-    body: "The Treasury mints 6-decimal tokens to your wallet (1:1 with shares) and takes a printed 0.5% fee. Selling runs the same path in reverse.",
+    title: "Whitelist-gated, always",
+    body: "The token checks approval on every single transfer — in and out.",
+  },
+  {
+    title: "0.5% fee, no middlemen",
+    body: "The Treasury is your direct counterparty. One printed fee, nothing hidden.",
   },
 ];
 
 export default function TasteLanding() {
   return (
     <div className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}>
+      <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <a href="#t-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper dark:focus:bg-night-ink dark:focus:text-night">
         Skip to content
       </a>
 
       {/* ————— nav ————— */}
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur dark:border-night-line dark:bg-night/90">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5 md:px-8">
-          <Link href="/taste" className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
+        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
+          <Link href="/taste" className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
             Chundrigar Capital
           </Link>
-          <nav aria-label="Sections" className="ml-2 hidden gap-6 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
-            <Link href="/taste/markets" className="transition-colors hover:text-ink dark:hover:text-night-ink">Markets</Link>
-            <a href="#t-mechanism" className="transition-colors hover:text-ink dark:hover:text-night-ink">Mechanism</a>
-            <a href="#t-compliance" className="transition-colors hover:text-ink dark:hover:text-night-ink">Compliance</a>
+          <nav aria-label="Sections" className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
+            <Link href="/taste/markets" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Markets</Link>
+            <a href="#t-how" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">How it works</a>
+            <a href="#t-trust" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Trust &amp; safety</a>
           </nav>
           <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
             Base Sepolia · TESTNET
           </span>
+          <ThemeToggle />
           <a
             href="/"
-            className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+            className="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
           >
-            Open the testnet app
+            <span className="sm:hidden">Open app</span>
+            <span className="hidden sm:inline">Open the testnet app</span>
           </a>
         </div>
       </header>
 
-      <main id="t-main" className="mx-auto max-w-6xl px-5 md:px-8">
-        {/* ————— hero: asymmetric split 7/5 ————— */}
+      <main id="t-main" className="mx-auto max-w-[1280px] px-5 md:px-8">
+        {/* ————— hero: asymmetric split 7/5, real live data as proof ————— */}
         <section className="grid gap-12 py-16 md:grid-cols-12 md:gap-10 md:py-24 lg:grid-cols-12">
           <div className="md:col-span-7 lg:self-center">
             <h1 className="text-5xl font-semibold tracking-tight">
-              Pakistan&rsquo;s stock exchange, settled on Base.
+              Own PSX shares as tokens, from anywhere.
             </h1>
             <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-ink-soft dark:text-night-ink-soft">
-              PSX shares become compliance-gated tokens, bought from the
-              Treasury at prices the backend signs and the contract verifies.
+              KSE-100 names like OGDC and Engro, issued as tokens on Base
+              Sepolia. Pay in rupees or USDC — tokens mint straight to your
+              wallet.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a
@@ -128,165 +127,107 @@ export default function TasteLanding() {
                 Open the testnet app
               </a>
               <a
-                href="#t-mechanism"
+                href="#t-how"
                 className="rounded-control border border-line px-6 py-3 font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
               >
-                Read the mechanism
+                See how it works
               </a>
             </div>
           </div>
 
-          {/* the visual: real pulled data, not a mockup */}
+          {/* the visual: live market data, not a mockup */}
           <div className="md:col-span-5">
             <div className="rounded-surface border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(23,24,28,0.06),0_12px_32px_rgba(23,24,28,0.08)] dark:border-night-line dark:bg-night-surface dark:shadow-[0_1px_2px_rgba(0,0,0,0.4),0_12px_32px_rgba(0,0,0,0.35)]">
               <p className="mb-5 border-b border-line pb-4 text-sm font-medium text-ink dark:border-night-line dark:text-night-ink">
-                Karachi, priced from anywhere
+                The market, live right now
               </p>
               <Ticker />
             </div>
             <p className="mt-3 text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
-              Veteran names trade here: OGDC, Engro, Lucky. The KSE 100 pull
-              above is live from this site&rsquo;s own cached route.
+              Live KSE 100 quotes, refreshed from the exchange feed.
             </p>
           </div>
         </section>
 
-        {/* ————— mechanism: bento, 4 cells for 4 items ————— */}
-        <section id="t-mechanism" className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <h2 className="max-w-[22ch] text-3xl font-semibold tracking-tight md:text-4xl">
-            Four commitments, enforced in code
+        {/* ————— how it works: three user-side steps ————— */}
+        <section id="t-how" className="border-t border-line py-16 dark:border-night-line md:py-24">
+          <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight md:text-4xl">
+            Three steps to your first token
           </h2>
           <p className="mt-3 max-w-[60ch] text-ink-soft dark:text-night-ink-soft">
-            The mechanism is not an intention with a roadmap. Each piece below
-            is a deployed contract on Base Sepolia.
+            From ID check to settled trade in one sitting.
           </p>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-4">
-            {PRINCIPLES.map((p) => (
-              <div
-                key={p.title}
-                className={`rounded-surface border border-line p-6 dark:border-night-line ${
-                  p.visual
-                    ? "bg-accent-wash dark:bg-night-wash"
-                    : "bg-surface dark:bg-night-surface"
-                } ${p.span}`}
-              >
-                <h3 className="text-lg font-medium tracking-tight text-ink dark:text-night-ink">
-                  {p.title}
+          <ol className="mt-10 grid list-none gap-10 p-0 md:grid-cols-3">
+            {STEPS.map((s, i) => (
+              <li key={s.name} className="border-t-2 border-ink pt-5 dark:border-night-ink">
+                <span className="t-figs text-xs text-accent dark:text-accent-bright">
+                  0{i + 1}
+                </span>
+                <h3 className="mt-2 text-lg font-medium tracking-tight text-ink dark:text-night-ink">
+                  {s.name}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                  {p.body}
+                <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
+                  {s.body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* ————— rails: pay at home or from abroad ————— */}
+        <section id="t-rails" className="border-t border-line py-16 dark:border-night-line md:py-24">
+          <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight md:text-4xl">
+            Pay the way that suits you
+          </h2>
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
+            {RAILS.map((r) => (
+              <div
+                key={r.title}
+                className="rounded-surface border border-line bg-surface p-6 md:p-8 dark:border-night-line dark:bg-night-surface"
+              >
+                <h3 className="text-xl font-medium tracking-tight text-ink dark:text-night-ink">
+                  {r.title}
+                </h3>
+                <p className="mt-3 max-w-[52ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
+                  {r.body}
                 </p>
               </div>
             ))}
           </div>
-
-          {/* the three-step trade path, on a full-width field */}
-          <div className="mt-4 rounded-surface bg-accent-wash p-6 dark:bg-night-wash md:p-8">
-            <ol className="grid gap-8 md:grid-cols-3">
-              {STEPS.map((s) => (
-                <li key={s.name}>
-                  <h4 className="font-medium tracking-tight text-ink dark:text-night-ink">
-                    {s.name}
-                  </h4>
-                  <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                    {s.body}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        {/* ————— compliance: zig-zag 1 of 2 ————— */}
-        <section id="t-compliance" className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <div className="grid items-center gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="max-w-[18ch] text-3xl font-semibold tracking-tight md:text-4xl">
-                Identity checked once, then on every transfer
-              </h2>
-              <p className="mt-4 max-w-[56ch] text-ink-soft dark:text-night-ink-soft">
-                Onboarding is concierge KYC during the MVP: you upload an ID, a
-                person reviews it, and approval writes your wallet into the
-                GlobalWhitelist.
-              </p>
-              <ul className="mt-6 space-y-3 text-sm text-ink-soft dark:text-night-ink-soft">
-                <li className="flex gap-3">
-                  <span className="t-figs shrink-0 text-accent dark:text-accent-bright">01</span>
-                  <span>Your wallet enters the register. Nothing else grants entry.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="t-figs shrink-0 text-accent dark:text-accent-bright">02</span>
-                  <span>Every token transfer, in and out, consults the register first.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="t-figs shrink-0 text-accent dark:text-accent-bright">03</span>
-                  <span>The register carries compliance powers: freeze, force transfer, force burn.</span>
-                </li>
-              </ul>
-              <p className="t-figs mt-6 text-xs text-ink-soft dark:text-night-ink-soft">
-                GlobalWhitelist {short(ADDRESSES.whitelist)}
-              </p>
-            </div>
-            {/* real photo goes here: founder reviewing an ID document at a desk (/todo 1600x1200) */}
-            <div className="aspect-[4/3] rounded-surface border border-dashed border-line bg-accent-wash/60 dark:border-night-line dark:bg-night-wash">
-              <div className="flex h-full items-center justify-center p-8 text-center">
-                <p className="max-w-[30ch] text-sm text-ink-soft dark:text-night-ink-soft">
-                  Image slot: the concierge review, one desk, one document. A
-                  real photograph belongs here.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ————— rails: 7/5, zig-zag 2 of 2 ————— */}
-        <section id="t-rails" className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <div className="grid gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-7">
-              <div className="rounded-surface border border-line bg-surface p-6 md:p-8 dark:border-night-line dark:bg-night-surface">
-                <h3 className="text-xl font-medium tracking-tight text-ink dark:text-night-ink">
-                  At home: pay in PKR
-                </h3>
-                <p className="mt-3 max-w-[56ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                  SPKR, the protocol&rsquo;s PKR stablecoin, prices the market
-                  natively. No foreign-exchange leg on your trade.
-                </p>
-                <p className="t-figs mt-5 text-xs text-ink-soft dark:text-night-ink-soft">
-                  SPKR {short(ADDRESSES.spkr)} · 6 decimals
-                </p>
-              </div>
-            </div>
-            <div className="lg:col-span-5">
-              <div className="rounded-surface border border-line bg-surface p-6 md:p-8 dark:border-night-line dark:bg-night-surface">
-                <h3 className="text-xl font-medium tracking-tight text-ink dark:text-night-ink">
-                  From abroad: pay in USDC
-                </h3>
-                <p className="mt-3 max-w-[56ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                  The FX conversion happens inside the signed quote, at
-                  execution time, not at yesterday&rsquo;s rate.
-                </p>
-                <p className="t-figs mt-5 text-xs text-ink-soft dark:text-night-ink-soft">
-                  Signer {short(ADDRESSES.signer)}
-                </p>
-              </div>
-            </div>
-          </div>
-          <p className="mt-6 max-w-[70ch] text-sm text-ink-soft dark:text-night-ink-soft">
-            Both rails meet at the same Treasury ({short(ADDRESSES.treasury)}),
-            under the same whitelist, at the same 0.5% fee.
+          <p className="mt-6 max-w-[60ch] text-sm text-ink-soft dark:text-night-ink-soft">
+            Both rails settle at the same price, at the same 0.5% fee.
           </p>
         </section>
 
-        {/* ————— close: full-width, single line, left-aligned ————— */}
+        {/* ————— trust: three promises, no lecture ————— */}
+        <section id="t-trust" className="border-t border-line py-16 dark:border-night-line md:py-24">
+          <h2 className="max-w-[22ch] text-3xl font-semibold tracking-tight md:text-4xl">
+            Built like an exchange, not a promise
+          </h2>
+          <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+            {TRUST.map((t, i) => (
+              <div key={t.title} className={i > 0 ? "md:border-l md:border-line md:pl-8 dark:md:border-night-line" : ""}>
+                <h3 className="text-lg font-medium tracking-tight text-ink dark:text-night-ink">
+                  {t.title}
+                </h3>
+                <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
+                  {t.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ————— close: one CTA, one line ————— */}
         <section className="border-t border-line py-16 dark:border-night-line md:py-24">
           <div className="flex flex-wrap items-center justify-between gap-6 md:flex-nowrap">
             <h2 className="max-w-[20ch] text-3xl font-semibold tracking-tight md:text-4xl">
-              The trade path works end to end. Walk it.
+              The testnet is live. Try a trade.
             </h2>
             <a
               href="/"
-              className="shrink-0 rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+              className="shrink-0 whitespace-nowrap rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
             >
               Open the testnet app
             </a>
@@ -296,7 +237,7 @@ export default function TasteLanding() {
 
       {/* ————— footer ————— */}
       <footer className="border-t border-line dark:border-night-line">
-        <div className="mx-auto max-w-6xl px-5 py-10 md:px-8">
+        <div className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <p className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
               Chundrigar Capital
@@ -313,7 +254,7 @@ export default function TasteLanding() {
               </a>
             </div>
           </div>
-          <p className="mt-6 max-w-[78ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
+          <p className="mt-6 max-w-[65ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
             Testnet software. Tokens represent simulated inventory during the
             MVP. Nothing here offers returns, yields, dividends, or
             appreciation, and nothing here claims a license or regulatory

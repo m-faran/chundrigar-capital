@@ -85,7 +85,7 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
               role="tab"
               aria-selected={r.key === rangeKey}
               onClick={() => setRangeKey(r.key)}
-              className={`t-figs rounded-control px-2.5 py-1 text-xs transition-colors ${
+              className={`t-figs relative rounded-control px-2.5 py-1 text-xs transition-colors after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] ${
                 r.key === rangeKey
                   ? "bg-ink text-paper dark:bg-night-ink dark:text-night"
                   : "bg-transparent text-ink-soft hover:bg-accent-wash hover:text-ink dark:text-night-ink-soft dark:hover:bg-night-wash dark:hover:text-night-ink"

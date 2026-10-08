@@ -83,9 +83,7 @@ export default function Ticker() {
       </div>
 
       <p className="text-[13px] leading-relaxed text-ink-soft dark:text-night-ink-soft">
-        Pulled {fx.pulledAt ?? "just now"} through this site&rsquo;s cached
-        routes (FX 60s, PSX 15s). The signer prices trades against the same
-        kind of pull.
+        Live quote · pulled {fx.pulledAt ?? "just now"} PKT
       </p>
     </div>
   );

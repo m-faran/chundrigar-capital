@@ -8,6 +8,11 @@
 
 @source "./";
 
+/* dark: follows a .dark class on <html> (set manually by the ThemeToggle,
+   persisted in localStorage, defaulting to the system preference) — not
+   prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* light (default) */
   --color-paper: #fbfaf7;
@@ -20,7 +25,7 @@
   --color-line: rgba(23, 24, 28, 0.12);
   --color-cta-text: #f5f7ff;
 
-  /* dark (prefers-color-scheme, applied via dark: pairs) */
+  /* dark (applied via the .dark class on <html>, see theme-toggle.tsx) */
   --color-night: #101114;
   --color-night-surface: #17181c;
   --color-night-wash: #1b1d24;
@@ -54,18 +59,16 @@
   outline-offset: 2px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .t-root {
-    scrollbar-color: rgba(236, 236, 238, 0.35) transparent;
-  }
+.dark .t-root {
+  scrollbar-color: rgba(236, 236, 238, 0.35) transparent;
+}
 
-  .t-root ::selection {
-    background: rgba(147, 168, 255, 0.3);
-  }
+.dark .t-root ::selection {
+  background: rgba(147, 168, 255, 0.3);
+}
 
-  .t-root :focus-visible {
-    outline-color: var(--color-accent-bright);
-  }
+.dark .t-root :focus-visible {
+  outline-color: var(--color-accent-bright);
 }
 
 @media (prefers-reduced-motion: reduce) {
