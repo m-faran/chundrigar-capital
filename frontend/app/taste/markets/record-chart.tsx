@@ -132,7 +132,9 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
                 key={i}
                 x={d.x}
                 y={H - 8}
-                textAnchor="middle"
+                textAnchor={
+                  i === 0 ? "start" : i === view.dates.length - 1 ? "end" : "middle"
+                }
                 className="fill-[#55575f] dark:fill-[#a1a3ab] font-mono text-[10px]"
               >
                 {d.label}

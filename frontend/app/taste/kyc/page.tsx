@@ -1,42 +1,28 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { fetchPSX } from "../../../lib/api-fetcher";
-import { MarketsClient } from "./markets-client";
 import { ThemeToggle } from "../theme-toggle";
 import { outfit, jbmono } from "../fonts";
+import { KycClient } from "./kyc-client";
 import "../taste.css";
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#101114" },
+  ],
+};
+
 export const metadata: Metadata = {
-  title: "Markets | Chundrigar Capital",
+  title: "Verify identity | Chundrigar Capital",
   description:
-    "Every scrip in the KSE 100 with its index weight and the day's points. Open one to read its record and trade it on Base Sepolia.",
+    "A CNIC or passport photo, a selfie, and a consent line. The Treasury settles trades only with whitelisted wallets on Base Sepolia.",
 };
-
-type Member = {
-  symbol: string;
-  idx_weight: number;
-  idx_point: number;
-  market_cap_m: number | null;
-};
-
-type KseResponse = { data?: Member[]; meta?: { timestamp?: string } };
 
 /* Applies the persisted (or system-default) theme before first paint,
    so the manual toggle never flashes the wrong mode. */
 const THEME_BOOT = `(function(){try{var s=localStorage.getItem("taste-theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
 
-export default async function TasteMarkets() {
-  let members: Member[] | null = null;
-  let pulledAt: string | null = null;
-
-  try {
-    const json = (await fetchPSX("/indices/KSE100")) as KseResponse;
-    members = (json?.data ?? []).filter((m) => m && m.symbol);
-    pulledAt = json?.meta?.timestamp ?? null;
-  } catch {
-    members = null;
-  }
-
+export default function TasteKyc() {
   return (
     <div
       className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}
@@ -44,23 +30,32 @@ export default async function TasteMarkets() {
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur dark:border-night-line dark:bg-night/90">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
-          <Link href="/taste" className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
+          <Link
+            href="/taste"
+            className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink"
+          >
             Chundrigar Capital
           </Link>
-          <nav aria-label="Site" className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
-            <Link href="/taste" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">
+          <nav
+            aria-label="Site"
+            className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex"
+          >
+            <Link
+              href="/taste"
+              className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink"
+            >
               Overview
             </Link>
             <Link
               href="/taste/markets"
-              aria-current="page"
-              className="inline-flex items-center rounded-control px-3 py-3 text-ink dark:text-night-ink"
+              className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink"
             >
               Markets
             </Link>
             <Link
               href="/taste/kyc"
-              className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink"
+              aria-current="page"
+              className="inline-flex items-center rounded-control px-3 py-3 text-ink dark:text-night-ink"
             >
               Verify
             </Link>
@@ -80,34 +75,26 @@ export default async function TasteMarkets() {
       </header>
 
       <main className="mx-auto max-w-[1280px] px-5 pb-24 pt-12 md:px-8 md:pt-16">
-        <h1 className="max-w-[24ch] text-4xl font-semibold tracking-tight md:text-5xl">
-          The KSE 100, as a working list.
+        <p className="t-figs text-xs text-ink-soft dark:text-night-ink-soft">
+          <Link
+            href="/taste/markets"
+            className="relative underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-4 after:content-[''] hover:underline"
+          >
+            Markets
+          </Link>
+          <span className="mx-2">/</span>
+          <span>Verify</span>
+        </p>
+        <h1 className="mt-3 max-w-[24ch] text-4xl font-semibold tracking-tight md:text-5xl">
+          One check, then you trade.
         </h1>
         <p className="mt-4 max-w-[58ch] text-ink-soft dark:text-night-ink-soft">
-          Every scrip in the index with its weight and the day&rsquo;s move.
-          Open one to read its record and trade it against the Treasury.
+          The Treasury settles trades only with whitelisted wallets. Add a
+          CNIC or passport, a selfie, and your consent — nothing leaves this
+          tab.
         </p>
 
-        {members ? (
-          <MarketsClient members={members} />
-        ) : (
-          <div className="mt-12 rounded-surface border border-line bg-surface p-8 dark:border-night-line dark:bg-night-surface">
-            <h2 className="text-lg font-medium tracking-tight">The feed did not answer</h2>
-            <p className="mt-2 max-w-[56ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-              The PSX data route is unreachable right now, so the list cannot
-              be drawn. Nothing is invented in its place. Reload to pull it
-              again.
-            </p>
-          </div>
-        )}
-
-        <p className="t-figs mt-6 text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
-          Weights and day points pulled
-          {pulledAt
-            ? ` ${new Date(pulledAt).toISOString().slice(0, 16).replace("T", " ")} UTC`
-            : ""}{" "}
-          from the PSX Data API through this site&rsquo;s cached route.
-        </p>
+        <KycClient />
       </main>
 
       <footer className="border-t border-line dark:border-night-line">

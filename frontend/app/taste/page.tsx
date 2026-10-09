@@ -69,7 +69,7 @@ const TRUST = [
     body: "The token checks approval on every single transfer — in and out.",
   },
   {
-    title: "0.5% fee, no middlemen",
+    title: "0.50% fee, no middlemen",
     body: "The Treasury is your direct counterparty. One printed fee, nothing hidden.",
   },
 ];
@@ -90,6 +90,7 @@ export default function TasteLanding() {
           </Link>
           <nav aria-label="Sections" className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
             <Link href="/taste/markets" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Markets</Link>
+            <Link href="/taste/kyc" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Verify</Link>
             <a href="#t-how" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">How it works</a>
             <a href="#t-trust" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Trust &amp; safety</a>
           </nav>
@@ -196,7 +197,7 @@ export default function TasteLanding() {
             ))}
           </div>
           <p className="mt-6 max-w-[60ch] text-sm text-ink-soft dark:text-night-ink-soft">
-            Both rails settle at the same price, at the same 0.5% fee.
+            Both rails settle at the same price, at the same 0.50% fee.
           </p>
         </section>
 
@@ -254,7 +255,7 @@ export default function TasteLanding() {
               </a>
             </div>
           </div>
-          <p className="mt-6 max-w-[65ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
+          <p className="mt-6 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
             Testnet software. Tokens represent simulated inventory during the
             MVP. Nothing here offers returns, yields, dividends, or
             appreciation, and nothing here claims a license or regulatory

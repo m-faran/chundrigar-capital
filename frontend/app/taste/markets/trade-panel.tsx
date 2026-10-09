@@ -299,14 +299,14 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
       </div>
 
       {/* buy / sell segmented control */}
-      <div className="mt-5 grid grid-cols-2 gap-1 rounded-none bg-accent-wash p-1 dark:bg-night-wash" role="group" aria-label="Action">
+      <div className="mt-5 grid grid-cols-2 gap-1 rounded-control bg-accent-wash p-1 dark:bg-night-wash" role="group" aria-label="Action">
         {(["buy", "sell"] as const).map((a) => (
           <button
             key={a}
             type="button"
             aria-pressed={action === a}
             onClick={() => setAction(a)}
-            className={`flex min-h-[44px] items-center justify-center rounded-none py-2 text-sm font-medium capitalize transition-colors ${
+            className={`flex min-h-[44px] items-center justify-center rounded-control py-2 text-sm font-medium capitalize transition-colors ${
               action === a
                 ? "bg-accent text-cta-text dark:bg-accent-bright dark:text-night"
                 : "bg-transparent text-ink-soft hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
@@ -329,7 +329,7 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
             value={qty}
             onChange={(e) => setQty(e.target.value.replace(/[^0-9.]/g, ""))}
             disabled={busy}
-            className="t-figs min-h-[44px] w-28 rounded-none border border-line bg-paper px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none disabled:opacity-50 dark:border-night-line dark:bg-night dark:text-night-ink dark:focus:border-accent-bright"
+            className="t-figs min-h-[44px] w-28 rounded-control border border-line bg-paper px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none disabled:opacity-50 dark:border-night-line dark:bg-night dark:text-night-ink dark:focus:border-accent-bright"
           />
           <span className="t-figs text-xs text-ink-soft dark:text-night-ink-soft">tokens</span>
         </div>
@@ -351,7 +351,7 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
               aria-pressed={rail === r}
               onClick={() => setRail(r)}
               disabled={busy}
-              className={`flex min-h-[44px] items-center justify-between rounded-none border px-4 py-2.5 text-sm transition-colors ${
+              className={`flex min-h-[44px] items-center justify-between rounded-control border px-4 py-2.5 text-sm transition-colors ${
                 rail === r
                   ? "border-accent bg-accent-wash text-ink dark:border-accent-bright dark:bg-night-wash dark:text-night-ink"
                   : "border-line bg-transparent text-ink-soft hover:border-ink-soft dark:border-night-line dark:text-night-ink-soft dark:hover:border-night-ink-soft"
@@ -443,13 +443,13 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
                 onChange={(e) => setTokenInput(e.target.value.trim())}
                 placeholder="0x..."
                 spellCheck={false}
-                className="t-figs mt-2 w-full rounded-none border border-line bg-paper px-3 py-2 text-xs text-ink focus:border-accent focus:outline-none dark:border-night-line dark:bg-night dark:text-night-ink dark:focus:border-accent-bright"
+                className="t-figs mt-2 w-full rounded-control border border-line bg-paper px-3 py-2 text-xs text-ink focus:border-accent focus:outline-none dark:border-night-line dark:bg-night dark:text-night-ink dark:focus:border-accent-bright"
               />
             </div>
           )}
 
           {error && (
-            <p className="mt-4 rounded-none border border-line bg-accent-wash px-4 py-3 text-xs leading-relaxed text-ink dark:border-night-line dark:bg-night-wash dark:text-night-ink" role="alert">
+            <p className="mt-4 rounded-surface border border-line bg-accent-wash px-4 py-3 text-xs leading-relaxed text-ink dark:border-night-line dark:bg-night-wash dark:text-night-ink" role="alert">
               {error}
             </p>
           )}
@@ -463,7 +463,7 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
             type="button"
             onClick={settle}
             disabled={busy}
-            className="mt-5 w-full rounded-none bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep disabled:opacity-60 dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+            className="mt-5 w-full rounded-control bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep disabled:opacity-60 dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
           >
             {action === "buy" ? "Sign quote and buy" : "Sign quote and sell"}
           </button>
@@ -486,7 +486,7 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
         <button
           type="button"
           onClick={() => switchChain({ chainId: baseSepolia.id })}
-          className="mt-5 w-full rounded-none border border-line bg-surface px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:bg-transparent dark:text-night-ink dark:hover:border-night-ink-soft"
+          className="mt-5 w-full rounded-control border border-line bg-surface px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:bg-transparent dark:text-night-ink dark:hover:border-night-ink-soft"
         >
           Switch to Base Sepolia
         </button>
@@ -494,13 +494,13 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
         <button
           type="button"
           onClick={() => connect({ connector: connectors[0] })}
-          className="mt-5 w-full rounded-none bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+          className="mt-5 w-full rounded-control bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
         >
           Connect wallet to trade
         </button>
       )}
 
-      <p className="mt-5 text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
+      <p className="mt-5 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
         The figures above are arithmetic from the real PSX close; the binding
         numbers come from the signed quote at execution and expire in five
         minutes. Testnet, simulated inventory, 0.50% fee on both sides. No

@@ -5,6 +5,7 @@ import { fetchPSX } from "../../../../lib/api-fetcher";
 import { RecordChart } from "../record-chart";
 import { TradePanel } from "../trade-panel";
 import { ThemeToggle } from "../../theme-toggle";
+import { outfit, jbmono } from "../../fonts";
 import "../../taste.css";
 
 export const viewport: Viewport = {
@@ -95,7 +96,9 @@ export default async function TasteRecord({
       : "n/a";
 
   return (
-    <div className="min-h-[100dvh] bg-paper text-ink dark:bg-night dark:text-night-ink">
+    <div
+      className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}
+    >
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur dark:border-night-line dark:bg-night/90">
         <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
@@ -108,6 +111,12 @@ export default async function TasteRecord({
             </Link>
             <Link href="/taste/markets" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">
               Markets
+            </Link>
+            <Link
+              href="/taste/kyc"
+              className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink"
+            >
+              Verify
             </Link>
           </nav>
           <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
@@ -240,7 +249,7 @@ export default async function TasteRecord({
               Base Sepolia · TESTNET
             </span>
           </div>
-          <p className="mt-6 max-w-[65ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
+          <p className="mt-6 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
             Testnet software. Tokens represent simulated inventory during the
             MVP. Nothing here offers returns, yields, dividends, or
             appreciation. Chundrigar Capital is the protocol; tokens issued on
