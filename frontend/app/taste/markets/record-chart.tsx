@@ -98,10 +98,10 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
       </div>
 
       {view && (
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 w-full">
           <svg
             viewBox={`0 0 ${W} ${H}`}
-            className="block h-auto w-full min-w-[420px]"
+            className="block h-auto w-full"
             role="img"
             aria-label={`Daily price chart, last ${view.slice.length} trading days`}
           >
@@ -156,7 +156,7 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
                         x2={cx}
                         y1={view.y(b.high)}
                         y2={view.y(b.low)}
-                        className={up ? "stroke-[#17181c] dark:stroke-[#ececee]" : "stroke-[#2148c0] dark:stroke-[#93a8ff]"}
+                        className={up ? "stroke-[#16a34a] dark:stroke-[#4ade80]" : "stroke-[#dc2626] dark:stroke-[#f87171]"}
                         strokeWidth="0.9"
                       />
                       <rect
@@ -166,8 +166,8 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
                         height={Math.max(1, bot - top)}
                         className={
                           up
-                            ? "fill-[#fbfaf7] stroke-[#17181c] dark:fill-[#101114] dark:stroke-[#ececee]"
-                            : "fill-[#2148c0] stroke-[#2148c0] dark:fill-[#93a8ff] dark:stroke-[#93a8ff]"
+                            ? "fill-[#16a34a]/25 stroke-[#16a34a] dark:fill-[#4ade80]/25 dark:stroke-[#4ade80]"
+                            : "fill-[#dc2626] stroke-[#dc2626] dark:fill-[#f87171] dark:stroke-[#f87171]"
                         }
                         strokeWidth="0.9"
                       />
@@ -215,7 +215,7 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
       )}
       <p className="mt-3 text-xs text-ink-soft dark:text-night-ink-soft">
         Candles through the 3-month window; longer ranges draw the close line.
-        Days closed higher print hollow, lower print in the accent.
+        Green indicates days closed higher, red indicates lower.
       </p>
     </div>
   );

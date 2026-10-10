@@ -75,7 +75,18 @@
   .t-root *,
   .t-root *::before,
   .t-root *::after {
-    transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Preserve subtle opacity and color transitions for state continuity */
+  .t-root button,
+  .t-root a,
+  .t-root input,
+  .t-root label {
+    transition-duration: 120ms !important;
+    transition-property: opacity, background-color, border-color, color !important;
   }
 }

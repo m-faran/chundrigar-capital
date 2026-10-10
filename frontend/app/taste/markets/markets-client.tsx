@@ -101,10 +101,12 @@ export function MarketsClient({ members }: { members: Member[] }) {
                   {fmtCap(m.market_cap_m)}
                 </td>
                 <td
-                  className={`t-figs px-5 py-3 text-right ${
-                    m.idx_point >= 0
-                      ? "text-ink dark:text-night-ink"
-                      : "text-ink-soft dark:text-night-ink-soft"
+                  className={`t-figs px-5 py-3 text-right font-medium ${
+                    m.idx_point > 0
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : m.idx_point < 0
+                        ? "text-rose-600 dark:text-rose-400"
+                        : "text-ink-soft dark:text-night-ink-soft"
                   }`}
                 >
                   {fmtPoint(m.idx_point)}

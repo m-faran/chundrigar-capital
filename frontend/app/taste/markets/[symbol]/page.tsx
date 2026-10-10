@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { fetchPSX } from "../../../../lib/api-fetcher";
 import { RecordChart } from "../record-chart";
 import { TradePanel } from "../trade-panel";
-import { ThemeToggle } from "../../theme-toggle";
+import { TasteHeader } from "../../nav";
 import { outfit, jbmono } from "../../fonts";
 import "../../taste.css";
 
@@ -100,38 +100,7 @@ export default async function TasteRecord({
       className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}
     >
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur dark:border-night-line dark:bg-night/90">
-        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
-          <Link href="/taste" className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
-            Chundrigar Capital
-          </Link>
-          <nav aria-label="Site" className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
-            <Link href="/taste" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">
-              Overview
-            </Link>
-            <Link href="/taste/markets" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">
-              Markets
-            </Link>
-            <Link
-              href="/taste/kyc"
-              className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink"
-            >
-              Verify
-            </Link>
-          </nav>
-          <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
-            Base Sepolia · TESTNET
-          </span>
-          <ThemeToggle />
-          <a
-            href="/"
-            className="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-          >
-            <span className="sm:hidden">Open app</span>
-            <span className="hidden sm:inline">Open the testnet app</span>
-          </a>
-        </div>
-      </header>
+      <TasteHeader />
 
       <main className="mx-auto max-w-[1280px] px-5 pb-24 pt-12 md:px-8 md:pt-16">
         <p className="t-figs text-xs text-ink-soft dark:text-night-ink-soft">
@@ -171,7 +140,15 @@ export default async function TasteRecord({
                       <p className="text-xs font-medium uppercase tracking-wide text-ink-soft dark:text-night-ink-soft">
                         Day change
                       </p>
-                      <p className="t-figs mt-1.5 text-lg">
+                      <p
+                        className={`t-figs mt-1.5 text-lg font-medium ${
+                          changePct == null
+                            ? "text-ink-soft dark:text-night-ink-soft"
+                            : changePct >= 0
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-rose-600 dark:text-rose-400"
+                        }`}
+                      >
                         {changePct == null
                           ? "n/a"
                           : `${changePct >= 0 ? "+" : "−"}${Math.abs(changePct).toFixed(2)}%`}

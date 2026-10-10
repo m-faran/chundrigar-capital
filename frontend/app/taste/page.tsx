@@ -1,20 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { outfit, jbmono } from "./fonts";
+import { TasteHeader } from "./nav";
 import Ticker from "./ticker";
-import { ThemeToggle } from "./theme-toggle";
 import "./taste.css";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-});
-
-const jbmono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jbmono",
-});
 
 export const metadata: Metadata = {
   title: "Chundrigar Capital | Pakistan Stock Exchange shares, as tokens",
@@ -37,14 +26,20 @@ const STEPS = [
   {
     name: "Verify once",
     body: "Upload an ID for a quick human review. Your wallet joins the whitelist — no repeat checks after that.",
+    href: "/taste/kyc",
+    cta: "Verify identity →",
   },
   {
     name: "Pick a stock, pay your way",
     body: "Choose any KSE-100 name and pay in PKR or USDC. You see the exact price before you confirm.",
+    href: "/taste/markets",
+    cta: "Browse KSE-100 →",
   },
   {
     name: "Tokens land in your wallet",
     body: "Shares mint to your wallet at the quoted price. Sell them back the same way, any time.",
+    href: "/taste/markets",
+    cta: "Start trading →",
   },
 ];
 
@@ -82,31 +77,8 @@ export default function TasteLanding() {
         Skip to content
       </a>
 
-      {/* ————— nav ————— */}
-      <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur dark:border-night-line dark:bg-night/90">
-        <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
-          <Link href="/taste" className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
-            Chundrigar Capital
-          </Link>
-          <nav aria-label="Sections" className="ml-2 hidden items-center gap-2 text-sm text-ink-soft dark:text-night-ink-soft md:flex">
-            <Link href="/taste/markets" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Markets</Link>
-            <Link href="/taste/kyc" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Verify</Link>
-            <a href="#t-how" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">How it works</a>
-            <a href="#t-trust" className="inline-flex items-center rounded-control px-3 py-3 transition-colors hover:text-ink dark:hover:text-night-ink">Trust &amp; safety</a>
-          </nav>
-          <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
-            Base Sepolia · TESTNET
-          </span>
-          <ThemeToggle />
-          <a
-            href="/"
-            className="inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-          >
-            <span className="sm:hidden">Open app</span>
-            <span className="hidden sm:inline">Open the testnet app</span>
-          </a>
-        </div>
-      </header>
+      {/* ————— responsive shared nav with mobile drawer ————— */}
+      <TasteHeader />
 
       <main id="t-main" className="mx-auto max-w-[1280px] px-5 md:px-8">
         {/* ————— hero: asymmetric split 7/5, real live data as proof ————— */}
@@ -121,12 +93,12 @@ export default function TasteLanding() {
               wallet.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href="/"
+              <Link
+                href="/taste/markets"
                 className="rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
               >
-                Open the testnet app
-              </a>
+                Explore markets
+              </Link>
               <a
                 href="#t-how"
                 className="rounded-control border border-line px-6 py-3 font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
@@ -150,7 +122,7 @@ export default function TasteLanding() {
           </div>
         </section>
 
-        {/* ————— how it works: three user-side steps ————— */}
+        {/* ————— how it works: three user-side steps with actionable links ————— */}
         <section id="t-how" className="border-t border-line py-16 dark:border-night-line md:py-24">
           <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight md:text-4xl">
             Three steps to your first token
@@ -161,7 +133,7 @@ export default function TasteLanding() {
 
           <ol className="mt-10 grid list-none gap-10 p-0 md:grid-cols-3">
             {STEPS.map((s, i) => (
-              <li key={s.name} className="border-t-2 border-ink pt-5 dark:border-night-ink">
+              <li key={s.name} className="flex flex-col border-t-2 border-ink pt-5 dark:border-night-ink">
                 <span className="t-figs text-xs text-accent dark:text-accent-bright">
                   0{i + 1}
                 </span>
@@ -171,6 +143,14 @@ export default function TasteLanding() {
                 <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
                   {s.body}
                 </p>
+                <div className="mt-4 pt-2">
+                  <Link
+                    href={s.href}
+                    className="inline-flex min-h-[44px] items-center text-sm font-medium text-accent underline-offset-4 hover:underline dark:text-accent-bright"
+                  >
+                    {s.cta}
+                  </Link>
+                </div>
               </li>
             ))}
           </ol>
@@ -226,12 +206,12 @@ export default function TasteLanding() {
             <h2 className="max-w-[20ch] text-3xl font-semibold tracking-tight md:text-4xl">
               The testnet is live. Try a trade.
             </h2>
-            <a
-              href="/"
+            <Link
+              href="/taste/markets"
               className="shrink-0 whitespace-nowrap rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
             >
-              Open the testnet app
-            </a>
+              Explore markets
+            </Link>
           </div>
         </section>
       </main>
@@ -247,12 +227,12 @@ export default function TasteLanding() {
               <span className="t-figs text-[11px] text-ink-soft dark:text-night-ink-soft">
                 Base Sepolia · TESTNET
               </span>
-              <a
-                href="/"
+              <Link
+                href="/taste/markets"
                 className="text-sm font-medium text-accent underline-offset-4 hover:underline dark:text-accent-bright"
               >
-                Open the testnet app
-              </a>
+                Explore markets
+              </Link>
             </div>
           </div>
           <p className="mt-6 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">

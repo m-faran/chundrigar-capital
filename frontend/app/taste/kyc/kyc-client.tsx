@@ -279,31 +279,37 @@ export function KycClient() {
               >
                 Which document?
               </h2>
-              <div
-                className="mt-4 grid gap-1.5"
-                role="group"
-                aria-label="Document type"
-              >
-                {DOCS.map((d) => (
-                  <button
-                    key={d.key}
-                    type="button"
-                    aria-pressed={doc === d.key}
-                    onClick={() => {
-                      setDoc(d.key);
-                      setError(null);
-                    }}
-                    className={`flex min-h-[44px] items-center justify-between rounded-control border px-4 py-2.5 text-sm transition-colors ${
-                      doc === d.key
-                        ? "border-accent bg-accent-wash text-ink dark:border-accent-bright dark:bg-night-wash dark:text-night-ink"
-                        : "border-line bg-transparent text-ink-soft hover:border-ink-soft dark:border-night-line dark:text-night-ink-soft dark:hover:border-night-ink-soft"
-                    }`}
-                  >
-                    <span className="font-medium">{d.label}</span>
-                    <span className="t-figs text-xs">{d.meta}</span>
-                  </button>
-                ))}
-              </div>
+              <fieldset className="mt-4 border-0 p-0 m-0">
+                <legend className="sr-only">Choose document type for verification</legend>
+                <div className="grid gap-1.5" role="radiogroup">
+                  {DOCS.map((d) => (
+                    <label
+                      key={d.key}
+                      className={`flex min-h-[44px] cursor-pointer items-center justify-between rounded-control border px-4 py-2.5 text-sm transition-colors ${
+                        doc === d.key
+                          ? "border-accent bg-accent-wash text-ink dark:border-accent-bright dark:bg-night-wash dark:text-night-ink"
+                          : "border-line bg-transparent text-ink-soft hover:border-ink-soft dark:border-night-line dark:text-night-ink-soft dark:hover:border-night-ink-soft"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="docType"
+                          value={d.key}
+                          checked={doc === d.key}
+                          onChange={() => {
+                            setDoc(d.key);
+                            setError(null);
+                          }}
+                          className="size-4 shrink-0 accent-[#2148c0] dark:accent-[#93a8ff]"
+                        />
+                        <span className="font-medium text-ink dark:text-night-ink">{d.label}</span>
+                      </div>
+                      <span className="t-figs text-xs">{d.meta}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
               <p className="mt-4 text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
                 Photos are plain JPG, PNG or HEIC exports, up to 10 MB each.
               </p>
