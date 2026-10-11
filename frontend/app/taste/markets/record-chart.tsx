@@ -29,6 +29,7 @@ const PAD_B = 26;
 export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
   const bars = useMemo(() => [...newestFirst].reverse(), [newestFirst]);
   const [rangeKey, setRangeKey] = useState<(typeof RANGES)[number]["key"]>("3M");
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
   const view = useMemo(() => {
     const n = RANGES.find((r) => r.key === rangeKey)?.bars ?? 66;
@@ -61,10 +62,12 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
     });
 
     const candle = slice.length <= 70;
-    const cw = Math.max(1.6, (plotW / slice.length) * 0.62);
+    const cw = Math.max(2, (plotW / slice.length) * 0.65);
 
     return { slice, x, y, ticks, dates, candle, cw };
   }, [bars, rangeKey]);
+
+  const activeBar = hoverIdx !== null && view ? view.slice[hoverIdx] ?? null : null;
 
   const fmtNum = (v: number) =>
     v >= 1000
@@ -74,9 +77,45 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 pt-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-ink-soft dark:text-night-ink-soft">
-          Price record · daily closes
-        </p>
+        {activeBar ? (
+          <div className="flex flex-wrap items-baseline gap-2.5 text-xs">
+            <span className="font-mono font-medium text-ink dark:text-night-ink">
+              {activeBar.date}
+            </span>
+            <span className="t-figs text-ink-soft dark:text-night-ink-soft">
+              O: <strong className="font-medium text-ink dark:text-night-ink">{fmtNum(activeBar.open)}</strong>
+            </span>
+            <span className="t-figs text-ink-soft dark:text-night-ink-soft">
+              H: <strong className="font-medium text-ink dark:text-night-ink">{fmtNum(activeBar.high)}</strong>
+            </span>
+            <span className="t-figs text-ink-soft dark:text-night-ink-soft">
+              L: <strong className="font-medium text-ink dark:text-night-ink">{fmtNum(activeBar.low)}</strong>
+            </span>
+            <span className="t-figs text-ink-soft dark:text-night-ink-soft">
+              C: <strong className="font-medium text-ink dark:text-night-ink">{fmtNum(activeBar.close)}</strong>
+            </span>
+            {(() => {
+              const diff = activeBar.close - activeBar.open;
+              const pct = activeBar.open ? ((diff / activeBar.open) * 100).toFixed(2) : "0.00";
+              const isUp = diff >= 0;
+              return (
+                <span
+                  className={`t-figs font-medium ${
+                    isUp
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-rose-600 dark:text-rose-400"
+                  }`}
+                >
+                  {isUp ? `+${pct}%` : `${pct}%`}
+                </span>
+              );
+            })()}
+          </div>
+        ) : (
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft dark:text-night-ink-soft">
+            Price record · daily closes
+          </p>
+        )}
         <div className="flex gap-1" role="tablist" aria-label="Chart range">
           {RANGES.map((r) => (
             <button
@@ -84,7 +123,10 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
               type="button"
               role="tab"
               aria-selected={r.key === rangeKey}
-              onClick={() => setRangeKey(r.key)}
+              onClick={() => {
+                setRangeKey(r.key);
+                setHoverIdx(null);
+              }}
               className={`t-figs relative rounded-control px-2.5 py-1 text-xs transition-colors after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] ${
                 r.key === rangeKey
                   ? "bg-ink text-paper dark:bg-night-ink dark:text-night"
@@ -101,9 +143,26 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
         <div className="mt-4 w-full">
           <svg
             viewBox={`0 0 ${W} ${H}`}
-            className="block h-auto w-full"
+            className="block h-auto w-full cursor-crosshair touch-none select-none"
             role="img"
             aria-label={`Daily price chart, last ${view.slice.length} trading days`}
+            onPointerMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const relX = ((e.clientX - rect.left) / rect.width) * W;
+              const plotW = W - PAD_L - PAD_R;
+              if (relX < PAD_L || relX > W - PAD_R) {
+                setHoverIdx(null);
+                return;
+              }
+              const frac = (relX - PAD_L) / plotW;
+              const idx = Math.max(
+                0,
+                Math.min(view.slice.length - 1, Math.floor(frac * view.slice.length))
+              );
+              setHoverIdx(idx);
+            }}
+            onPointerLeave={() => setHoverIdx(null)}
+            onTouchCancel={() => setHoverIdx(null)}
           >
             {/* grid: quiet hairlines, ink at 7% */}
             {view.ticks.map((t, i) => (
@@ -141,6 +200,20 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
               </text>
             ))}
 
+            {/* scrub crosshair */}
+            {hoverIdx !== null && (
+              <line
+                x1={view.x(hoverIdx)}
+                x2={view.x(hoverIdx)}
+                y1={PAD_T}
+                y2={H - PAD_B}
+                className="stroke-[#17181c] dark:stroke-[#ececee]"
+                strokeOpacity="0.3"
+                strokeWidth="1"
+                strokeDasharray="2 3"
+              />
+            )}
+
             {view.candle
               ? view.slice.map((b, i) => {
                   const up = b.close >= b.open;
@@ -148,8 +221,9 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
                   const bw = view.cw;
                   const top = view.y(Math.max(b.open, b.close));
                   const bot = view.y(Math.min(b.open, b.close));
+                  const isHovered = hoverIdx === i;
                   return (
-                    <g key={b.date + i}>
+                    <g key={b.date + i} opacity={hoverIdx === null || isHovered ? 1 : 0.6}>
                       <title>{`${b.date}: O ${b.open} · H ${b.high} · L ${b.low} · C ${b.close}`}</title>
                       <line
                         x1={cx}
@@ -157,19 +231,19 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
                         y1={view.y(b.high)}
                         y2={view.y(b.low)}
                         className={up ? "stroke-[#16a34a] dark:stroke-[#4ade80]" : "stroke-[#dc2626] dark:stroke-[#f87171]"}
-                        strokeWidth="0.9"
+                        strokeWidth="1"
                       />
                       <rect
                         x={cx - bw / 2}
                         y={top}
                         width={bw}
-                        height={Math.max(1, bot - top)}
+                        height={Math.max(1.5, bot - top)}
                         className={
                           up
-                            ? "fill-[#16a34a]/25 stroke-[#16a34a] dark:fill-[#4ade80]/25 dark:stroke-[#4ade80]"
+                            ? "fill-[#16a34a] stroke-[#16a34a] dark:fill-[#4ade80] dark:stroke-[#4ade80]"
                             : "fill-[#dc2626] stroke-[#dc2626] dark:fill-[#f87171] dark:stroke-[#f87171]"
                         }
-                        strokeWidth="0.9"
+                        strokeWidth="1"
                       />
                     </g>
                   );
@@ -210,12 +284,27 @@ export function RecordChart({ bars: newestFirst }: { bars: Bar[] }) {
                     </g>
                   );
                 })()}
+
+            {/* active scrub dot on close */}
+            {hoverIdx !== null && activeBar && (
+              <circle
+                cx={view.x(hoverIdx)}
+                cy={view.y(activeBar.close)}
+                r="3"
+                className={
+                  activeBar.close >= activeBar.open
+                    ? "fill-[#16a34a] stroke-paper dark:fill-[#4ade80] dark:stroke-night"
+                    : "fill-[#dc2626] stroke-paper dark:fill-[#f87171] dark:stroke-night"
+                }
+                strokeWidth="1.5"
+              />
+            )}
           </svg>
         </div>
       )}
       <p className="mt-3 text-xs text-ink-soft dark:text-night-ink-soft">
         Candles through the 3-month window; longer ranges draw the close line.
-        Green indicates days closed higher, red indicates lower.
+        Solid green indicates days closed higher, solid red indicates lower. Hover or drag across the chart to inspect daily figures.
       </p>
     </div>
   );

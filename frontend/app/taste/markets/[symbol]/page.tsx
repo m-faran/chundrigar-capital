@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchPSX } from "../../../../lib/api-fetcher";
+import { getScripMeta } from "../../../../lib/psx-scrips";
 import { RecordChart } from "../record-chart";
 import { TradePanel } from "../trade-panel";
 import { TasteHeader } from "../../nav";
@@ -15,11 +16,19 @@ export const viewport: Viewport = {
   ],
 };
 
-export const metadata: Metadata = {
-  title: "Market record | Chundrigar Capital",
-  description:
-    "A scrip's real PSX price record and a trade panel that settles against the Treasury on Base Sepolia.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ symbol: string }>;
+}): Promise<Metadata> {
+  const { symbol: raw } = await params;
+  const symbol = decodeURIComponent(raw).trim().toUpperCase();
+  const meta = getScripMeta(symbol);
+  return {
+    title: `${symbol} · ${meta.name} | Chundrigar Capital`,
+    description: `A real PSX price record for ${meta.name} (${symbol}) and a trade panel that settles against the Treasury on Base Sepolia.`,
+  };
+}
 
 type Bar = {
   date: string;
@@ -48,6 +57,8 @@ export default async function TasteRecord({
   const { symbol: raw } = await params;
   const symbol = decodeURIComponent(raw).trim().toUpperCase();
   if (!/^[A-Z0-9-]{2,12}$/.test(symbol)) notFound();
+
+  const meta = getScripMeta(symbol);
 
   let bars: Bar[] | null = null;
   let price: number | null = null;
@@ -108,11 +119,25 @@ export default async function TasteRecord({
             Markets
           </Link>
           <span className="mx-2">/</span>
-          <span>KSE 100</span>
+          <span>{meta.sector}</span>
+          <span className="mx-2">/</span>
+          <span>{symbol}</span>
         </p>
-        <h1 className="t-figs mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
-          {symbol}
-        </h1>
+        <div className="mt-3 flex flex-wrap items-baseline gap-3">
+          <h1 className="t-figs text-4xl font-semibold tracking-tight md:text-5xl">
+            {symbol}
+          </h1>
+          {meta.name && meta.name !== symbol && (
+            <span className="text-xl font-normal text-ink-soft dark:text-night-ink-soft md:text-2xl">
+              · {meta.name}
+            </span>
+          )}
+        </div>
+        <div className="mt-2 flex items-center gap-2">
+          <span className="rounded bg-accent-wash px-2 py-0.5 text-xs font-medium text-ink-soft dark:bg-night-wash dark:text-night-ink-soft">
+            {meta.sector}
+          </span>
+        </div>
         <p className="mt-3 max-w-[58ch] text-ink-soft dark:text-night-ink-soft">
           One token equals one share, held 1:1 in simulated inventory during
           the MVP. The record below is the scrip&rsquo;s real PSX history.

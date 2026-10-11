@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchPSX } from "../../../lib/api-fetcher";
+import { getScripMeta, SectorCategory } from "../../../lib/psx-scrips";
 import { MarketsClient } from "./markets-client";
 import { TasteHeader } from "../nav";
 import { outfit, jbmono } from "../fonts";
@@ -11,14 +12,23 @@ export const metadata: Metadata = {
     "Every scrip in the KSE 100 with its index weight and the day's points. Open one to read its record and trade it on Base Sepolia.",
 };
 
-type Member = {
+export type Member = {
+  symbol: string;
+  name: string;
+  sector: SectorCategory;
+  idx_weight: number;
+  idx_point: number;
+  market_cap_m: number | null;
+};
+
+type RawMember = {
   symbol: string;
   idx_weight: number;
   idx_point: number;
   market_cap_m: number | null;
 };
 
-type KseResponse = { data?: Member[]; meta?: { timestamp?: string } };
+type KseResponse = { data?: RawMember[]; meta?: { timestamp?: string } };
 
 /* Applies the persisted (or system-default) theme before first paint,
    so the manual toggle never flashes the wrong mode. */
@@ -30,7 +40,15 @@ export default async function TasteMarkets() {
 
   try {
     const json = (await fetchPSX("/indices/KSE100")) as KseResponse;
-    members = (json?.data ?? []).filter((m) => m && m.symbol);
+    const rawList = (json?.data ?? []).filter((m) => m && m.symbol);
+    members = rawList.map((m) => {
+      const meta = getScripMeta(m.symbol);
+      return {
+        ...m,
+        name: meta.name,
+        sector: meta.sector,
+      };
+    });
     pulledAt = json?.meta?.timestamp ?? null;
   } catch {
     members = null;
