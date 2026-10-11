@@ -18,22 +18,17 @@ export const metadata: Metadata = {
     "A CNIC or passport photo, a selfie, and a consent line. The Treasury settles trades only with whitelisted wallets on Base Sepolia.",
 };
 
-/* Applies the persisted (or system-default) theme before first paint,
-   so the manual toggle never flashes the wrong mode. */
-const THEME_BOOT = `(function(){try{var s=localStorage.getItem("taste-theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
-
 export default function TasteKyc() {
   return (
     <div
       className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}
     >
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <TasteHeader />
 
       <main className="mx-auto max-w-[1280px] px-5 pb-24 pt-12 md:px-8 md:pt-16">
         <p className="t-figs text-xs text-ink-soft dark:text-night-ink-soft">
           <Link
-            href="/taste"
+            href="/"
             className="relative underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-4 after:content-[''] hover:underline"
           >
             Overview

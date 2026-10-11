@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchPSX } from "../../../../lib/api-fetcher";
-import { getScripMeta } from "../../../../lib/psx-scrips";
+import { fetchPSX } from "../../../lib/api-fetcher";
+import { getScripMeta } from "../../../lib/psx-scrips";
 import { RecordChart } from "../record-chart";
 import { TradePanel } from "../trade-panel";
 import { TasteHeader } from "../../nav";
@@ -44,10 +44,6 @@ type QuoteResponse = {
   data?: { price?: number; change_pct?: number | null } | null;
 };
 type KseResponse = { data?: { symbol: string }[] };
-
-/* Applies the persisted (or system-default) theme before first paint,
-   so the manual toggle never flashes the wrong mode. */
-const THEME_BOOT = `(function(){try{var s=localStorage.getItem("taste-theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
 
 export default async function TasteRecord({
   params,
@@ -110,12 +106,11 @@ export default async function TasteRecord({
     <div
       className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}
     >
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <TasteHeader />
 
       <main className="mx-auto max-w-[1280px] px-5 pb-24 pt-12 md:px-8 md:pt-16">
         <p className="t-figs text-xs text-ink-soft dark:text-night-ink-soft">
-          <Link href="/taste/markets" className="relative underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-4 after:content-[''] hover:underline">
+          <Link href="/markets" className="relative underline-offset-4 after:absolute after:-inset-x-2 after:-inset-y-4 after:content-[''] hover:underline">
             Markets
           </Link>
           <span className="mx-2">/</span>
@@ -203,7 +198,7 @@ export default async function TasteRecord({
               pull it again.
             </p>
             <Link
-              href="/taste/markets"
+              href="/markets"
               className="mt-4 inline-block text-sm font-medium text-accent underline-offset-4 hover:underline dark:text-accent-bright"
             >
               Back to Markets
@@ -216,7 +211,7 @@ export default async function TasteRecord({
         <div className="mt-12 flex items-center justify-between border-t border-line pt-6 dark:border-night-line">
           {neighbors.prev ? (
             <Link
-              href={`/taste/markets/${neighbors.prev}`}
+              href={`/markets/${neighbors.prev}`}
               className="t-figs text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline dark:text-night-ink-soft dark:hover:text-night-ink"
             >
               ← {neighbors.prev}
@@ -229,7 +224,7 @@ export default async function TasteRecord({
           </span>
           {neighbors.next ? (
             <Link
-              href={`/taste/markets/${neighbors.next}`}
+              href={`/markets/${neighbors.next}`}
               className="t-figs text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline dark:text-night-ink-soft dark:hover:text-night-ink"
             >
               {neighbors.next} →

@@ -24,9 +24,9 @@ export function TasteHeader() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const isOverview = pathname === "/taste";
-  const isMarkets = pathname.startsWith("/taste/markets");
-  const isKyc = pathname.startsWith("/taste/kyc");
+  const isOverview = pathname === "/";
+  const isMarkets = pathname.startsWith("/markets");
+  const isKyc = pathname.startsWith("/kyc");
 
   const navItemClass = (active: boolean) =>
     `inline-flex min-h-[44px] items-center rounded-control px-3 py-2 text-sm transition-colors ${
@@ -39,7 +39,7 @@ export function TasteHeader() {
     <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur dark:border-night-line dark:bg-night/95">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
         <Link
-          href="/taste"
+          href="/"
           className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink"
         >
           Chundrigar Capital
@@ -51,21 +51,21 @@ export function TasteHeader() {
           className="ml-2 hidden items-center gap-1 text-sm md:flex"
         >
           <Link
-            href="/taste"
+            href="/"
             aria-current={isOverview ? "page" : undefined}
             className={navItemClass(isOverview)}
           >
             Overview
           </Link>
           <Link
-            href="/taste/markets"
+            href="/markets"
             aria-current={isMarkets ? "page" : undefined}
             className={navItemClass(isMarkets)}
           >
             Markets
           </Link>
           <Link
-            href="/taste/kyc"
+            href="/kyc"
             aria-current={isKyc ? "page" : undefined}
             className={navItemClass(isKyc)}
           >
@@ -101,7 +101,7 @@ export function TasteHeader() {
 
         {/* Primary CTA (desktop) */}
         <Link
-          href="/taste/markets"
+          href="/markets"
           className="hidden min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep sm:inline-flex"
         >
           Explore markets
@@ -128,7 +128,7 @@ export function TasteHeader() {
         >
           <nav aria-label="Mobile navigation" className="flex flex-col gap-1">
             <Link
-              href="/taste"
+              href="/"
               aria-current={isOverview ? "page" : undefined}
               className={`flex min-h-[44px] items-center rounded-control px-3 py-2 text-base ${
                 isOverview
@@ -139,7 +139,7 @@ export function TasteHeader() {
               Overview
             </Link>
             <Link
-              href="/taste/markets"
+              href="/markets"
               aria-current={isMarkets ? "page" : undefined}
               className={`flex min-h-[44px] items-center rounded-control px-3 py-2 text-base ${
                 isMarkets
@@ -150,7 +150,7 @@ export function TasteHeader() {
               Markets
             </Link>
             <Link
-              href="/taste/kyc"
+              href="/kyc"
               aria-current={isKyc ? "page" : undefined}
               className={`flex min-h-[44px] items-center rounded-control px-3 py-2 text-base ${
                 isKyc
@@ -184,7 +184,7 @@ export function TasteHeader() {
                 Base Sepolia · TESTNET
               </span>
               <Link
-                href="/taste/markets"
+                href="/markets"
                 className="inline-flex min-h-[44px] items-center rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night"
               >
                 Explore markets

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import type { SectorCategory } from "../../../lib/psx-scrips";
+import type { SectorCategory } from "../../lib/psx-scrips";
 
 export type Member = {
   symbol: string;
@@ -197,7 +197,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
                   <div className="flex flex-col">
                     <div className="flex flex-wrap items-center gap-2">
                       <Link
-                        href={`/taste/markets/${encodeURIComponent(m.symbol)}`}
+                        href={`/markets/${encodeURIComponent(m.symbol)}`}
                         className="t-figs font-semibold text-ink underline-offset-4 hover:underline dark:text-night-ink"
                       >
                         {m.symbol}

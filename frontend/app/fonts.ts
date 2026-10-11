@@ -12,6 +12,5 @@ export const outfit = Outfit({
 
 export const jbmono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   variable: "--font-jbmono",
 });

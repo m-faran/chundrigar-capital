@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { fetchPSX } from "../../../lib/api-fetcher";
-import { getScripMeta, SectorCategory } from "../../../lib/psx-scrips";
+import { fetchPSX } from "../../lib/api-fetcher";
+import { getScripMeta, SectorCategory } from "../../lib/psx-scrips";
 import { MarketsClient } from "./markets-client";
 import { TasteHeader } from "../nav";
 import { outfit, jbmono } from "../fonts";
@@ -30,10 +30,6 @@ type RawMember = {
 
 type KseResponse = { data?: RawMember[]; meta?: { timestamp?: string } };
 
-/* Applies the persisted (or system-default) theme before first paint,
-   so the manual toggle never flashes the wrong mode. */
-const THEME_BOOT = `(function(){try{var s=localStorage.getItem("taste-theme");var d=s?s==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.classList.add("dark")}catch(e){}})()`;
-
 export default async function TasteMarkets() {
   let members: Member[] | null = null;
   let pulledAt: string | null = null;
@@ -58,7 +54,6 @@ export default async function TasteMarkets() {
     <div
       className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}
     >
-      <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       <TasteHeader />
 
       <main className="mx-auto max-w-[1280px] px-5 pb-24 pt-12 md:px-8 md:pt-16">
