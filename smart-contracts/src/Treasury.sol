@@ -50,7 +50,7 @@ contract Treasury is Ownable, ReentrancyGuard, Pausable {
     /**
      * @notice Deploys a new PSX Token. Treasury retains MINTER_ROLE.
      */
-    function deployToken(string memory name, string memory symbol) external onlyOwner returns (address) {
+    function deployToken(string memory name, string memory symbol) public onlyOwner returns (address) {
         // Deploy with 18 decimals
         // The CompliantToken constructor automatically grants MINTER_ROLE to msg.sender (Treasury)
         CompliantToken newToken = new CompliantToken(name, symbol, 18, whitelist, owner());
@@ -58,6 +58,16 @@ contract Treasury is Ownable, ReentrancyGuard, Pausable {
         isPSXToken[address(newToken)] = true;
         emit TokenDeployed(address(newToken), symbol);
         return address(newToken);
+    }
+
+    /**
+     * @notice Deploys multiple PSX Tokens in a single transaction batch.
+     */
+    function deployTokensBatch(string[] memory names, string[] memory symbols) external onlyOwner {
+        require(names.length == symbols.length, "Length mismatch");
+        for (uint256 i = 0; i < names.length; i++) {
+            deployToken(names[i], symbols[i]);
+        }
     }
 
     function setSigner(address _signer) external onlyOwner {

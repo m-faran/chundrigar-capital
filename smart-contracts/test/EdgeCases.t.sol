@@ -45,8 +45,9 @@ contract EdgeCasesTest is Test {
         address tokenAddr = treasury.deployToken("OGDC Stock", "OGDC");
         psxToken = CompliantToken(tokenAddr);
 
-        // Whitelist user
+        // Whitelist user and feeReceiver
         whitelist.setWhitelist(user, true);
+        whitelist.setWhitelist(feeReceiver, true);
 
         // Fund user
         paymentToken.mint(user, 10_000 * 10**6);
@@ -64,9 +65,9 @@ contract EdgeCasesTest is Test {
         uint256 nonce,
         address sender,
         uint256 pk
-    ) internal pure returns (bytes memory) {
+    ) internal view returns (bytes memory) {
         bytes32 messageHash = keccak256(
-            abi.encodePacked(action, token, payToken, amount, payAmount, deadline, nonce, sender)
+            abi.encodePacked(action, block.chainid, address(treasury), token, payToken, amount, payAmount, deadline, nonce, sender)
         );
         bytes32 ethSignedMessageHash = MessageHashUtils.toEthSignedMessageHash(messageHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(pk, ethSignedMessageHash);
@@ -292,18 +293,8 @@ contract EdgeCasesTest is Test {
         psxToken.forceTransfer(user, unwhitelistedUser, 50 * 10**18);
         
         assertEq(psxToken.balanceOf(user), 50 * 10**18);
-        assertEq(psxToken.frozenBalances(user), 100 * 10**18);
-        
-        // Step 4: The underflow DOS occurs.
-        // Even if the user tries to transfer 0 tokens, or receives tokens and then tries to transfer,
-        // it reverts due to panic (arithmetic underflow) instead of a graceful require message,
-        // because `balanceOf(from) - frozenBalances[from]` is evaluated BEFORE the require check.
-        // 50 - 100 underflows.
-        
-        // Expect a Panic error (0x11 is panic for underflow/overflow)
-        vm.expectRevert(abi.encodeWithSignature("Panic(uint256)", 0x11));
-        vm.prank(user);
-        psxToken.transfer(address(0x444), 0);
+        // Bug fix verified: frozen balance is clamped to available balance, preventing underflow
+        assertEq(psxToken.frozenBalances(user), 50 * 10**18);
     }
 
     function test_Lead_SharedPoolInsolvency() public {
@@ -340,6 +331,25 @@ contract EdgeCasesTest is Test {
         vm.prank(user);
         vm.expectRevert(); // SafeERC20: ERC20 operation did not succeed (or insufficient balance)
         treasury.sell(address(psxToken), address(paymentToken), amount, sellPaymentAmount, block.timestamp + 60, 1, sigSell1);
+    }
+
+    function test_DeployTokensBatch() public {
+        string[] memory names = new string[](10);
+        string[] memory symbols = new string[](10);
+        for (uint256 i = 0; i < 10; i++) {
+            names[i] = "Test Stock";
+            symbols[i] = string(abi.encodePacked("STK", vm.toString(i)));
+        }
+
+        uint256 gasStart = gasleft();
+        treasury.deployTokensBatch(names, symbols);
+        uint256 gasUsed = gasStart - gasleft();
+        console.log("Gas used for 10 tokens batch:", gasUsed);
+
+        // Ensure length mismatch reverts
+        string[] memory badNames = new string[](2);
+        vm.expectRevert("Length mismatch");
+        treasury.deployTokensBatch(badNames, symbols);
     }
 
     function test_Lead_ForceTransferZeroAddressIsFalsePositive() public {

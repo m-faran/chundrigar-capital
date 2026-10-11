@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sync-tokens": "node scripts/sync-tokens.js"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

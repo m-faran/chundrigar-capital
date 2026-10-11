@@ -15,6 +15,7 @@ import { baseSepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { injected } from "wagmi/connectors";
 import { parseUnits } from "viem";
+import deployedTokens from "../../lib/deployed-tokens.json";
 
 /* Real Base Sepolia deployments (PRODUCT.md / Tasks.md). */
 const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
@@ -79,7 +80,7 @@ const TREASURY_ABI = [
     type: "event",
     name: "TokenDeployed",
     inputs: [
-      { name: "tokenAddress", type: "address", indexed: false },
+      { name: "token", type: "address", indexed: true },
       { name: "symbol", type: "string", indexed: false },
     ],
   },
@@ -94,7 +95,7 @@ const WHITELIST_ABI = [
   },
 ] as const;
 
-const WHITELIST_ADDRESS = "0xb090dE63b98b3e58ea1fe4374f20184076c0091A" as const;
+const WHITELIST_ADDRESS = (process.env.NEXT_PUBLIC_WHITELIST_ADDRESS || "0x9Bc73981e89587C462BDa66Aa18cBA001b4EB979") as `0x${string}`;
 
 const FEE_BPS = 50;
 
@@ -180,8 +181,13 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
     readChainState();
   }, [readChainState]);
 
-  /* resolve the stock token from recent TokenDeployed logs */
+  /* resolve the stock token: check deployed-tokens.json first, fallback to getLogs */
   useEffect(() => {
+    const staticToken = (deployedTokens as Record<string, string>)[symbol];
+    if (staticToken) {
+      setToken(staticToken);
+      return;
+    }
     if (!publicClient) return;
     let alive = true;
     (async () => {
@@ -196,10 +202,10 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
           toBlock: "latest",
         });
         const matches = logs
-          .map((l) => l.args as { symbol?: string; tokenAddress?: string })
-          .filter((a) => a.symbol === symbol && a.tokenAddress);
+          .map((l) => l.args as { symbol?: string; token?: string })
+          .filter((a) => a.symbol === symbol && a.token);
         if (alive && matches.length > 0) {
-          setToken(matches[matches.length - 1].tokenAddress!);
+          setToken(matches[matches.length - 1].token!);
         }
       } catch {
         /* unresolved; the advanced field covers it */
