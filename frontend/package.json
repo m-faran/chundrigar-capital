@@ -6,18 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint",
-    "sync-tokens": "node scripts/sync-tokens.js"
+    "sync-tokens": "node scripts/sync-tokens.js",
+    "allow-tokens": "node scripts/set-allowed-tokens.js"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "@rainbow-me/rainbowkit": "^2.2.11",
     "@tanstack/react-query": "^5.104.1",
+    "@walletconnect/ethereum-provider": "^2.26.0",
     "lucide-react": "^1.53.0",
     "motion": "^14.0.0",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "viem": "^2.57.2",
-    "wagmi": "^3.7.7"
+    "wagmi": "^2.19.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ThemeToggle } from "./theme-toggle";
 
 export function TasteHeader() {
@@ -99,13 +100,10 @@ export function TasteHeader() {
           <ThemeToggle />
         </div>
 
-        {/* Primary CTA (desktop) */}
-        <Link
-          href="/markets"
-          className="hidden min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep sm:inline-flex"
-        >
-          Explore markets
-        </Link>
+        {/* RainbowKit Wallet Connect (desktop) */}
+        <div className="hidden shrink-0 items-center sm:flex">
+          <ConnectButton showBalance={false} />
+        </div>
 
         {/* Mobile menu button */}
         <button
@@ -183,12 +181,7 @@ export function TasteHeader() {
               <span className="t-figs text-xs text-ink-soft dark:text-night-ink-soft">
                 Base Sepolia · TESTNET
               </span>
-              <Link
-                href="/markets"
-                className="inline-flex min-h-[44px] items-center rounded-control bg-accent px-4 py-2 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night"
-              >
-                Explore markets
-              </Link>
+              <ConnectButton showBalance={false} />
             </div>
           </nav>
         </div>

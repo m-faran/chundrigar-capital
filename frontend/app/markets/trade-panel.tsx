@@ -2,32 +2,20 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
-  createConfig,
-  http,
-  WagmiProvider,
   useAccount,
-  useConnect,
   useWriteContract,
   useSwitchChain,
   usePublicClient,
 } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { injected } from "wagmi/connectors";
-import { parseUnits } from "viem";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { parseUnits, maxUint256 } from "viem";
 import deployedTokens from "../../lib/deployed-tokens.json";
 
 /* Real Base Sepolia deployments (PRODUCT.md / Tasks.md). */
 const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
 const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
 const SPKR_ADDRESS = process.env.NEXT_PUBLIC_SPKR_ADDRESS as `0x${string}`;
-
-const wagmiConfig = createConfig({
-  chains: [baseSepolia],
-  transports: { [baseSepolia.id]: http() },
-  connectors: [injected()],
-});
-const queryClient = new QueryClient();
 
 const ERC20_ABI = [
   {
@@ -38,6 +26,15 @@ const ERC20_ABI = [
       { name: "amount", type: "uint256" },
     ],
     outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "allowance",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
   },
 ] as const;
 
@@ -108,7 +105,6 @@ type Phase =
 
 function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors } = useConnect();
   const { switchChain } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
@@ -118,10 +114,14 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
   const [qty, setQty] = useState("10");
   const [fx, setFx] = useState<number | null>(null);
   const [nonce, setNonce] = useState<bigint | null>(null);
+  const [allowance, setAllowance] = useState<bigint | null>(null);
+  const [approving, setApproving] = useState(false);
   const [whitelisted, setWhitelisted] = useState<boolean | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const staticToken = (deployedTokens as Record<string, string>)[symbol?.toUpperCase()] || null;
+  const [discoveredToken, setDiscoveredToken] = useState<string | null>(null);
   const [tokenInput, setTokenInput] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const token = (tokenInput.trim() || staticToken || discoveredToken) as `0x${string}` | null;
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
 
@@ -137,6 +137,19 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
         ? payAmountNum + feeNum
         : payAmountNum - feeNum
       : null;
+
+  const isUSDC = rail === "USDC";
+  const displayDecimals = isUSDC ? 6 : 18;
+  const totalCostRaw: bigint | null =
+    totalNum != null && totalNum > 0
+      ? BigInt(Math.ceil(totalNum * (10 ** displayDecimals)))
+      : null;
+
+  const needsApproval =
+    action === "buy" &&
+    totalCostRaw != null &&
+    allowance != null &&
+    allowance < totalCostRaw;
 
   /* live USD/PKR for the panel's arithmetic; the signer pulls its own at execution */
   useEffect(() => {
@@ -169,26 +182,31 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
       })) as boolean;
       setNonce(n);
       setWhitelisted(w);
+
+      if (paymentToken && TREASURY_ADDRESS) {
+        const a = (await publicClient.readContract({
+          address: paymentToken,
+          abi: ERC20_ABI,
+          functionName: "allowance",
+          args: [address, TREASURY_ADDRESS],
+        })) as bigint;
+        setAllowance(a);
+      }
     } catch {
       /* unreadable; the panel says what it could not read */
     }
-  }, [address, publicClient]);
+  }, [address, publicClient, paymentToken]);
 
   useEffect(() => {
     setNonce(null);
+    setAllowance(null);
     setWhitelisted(null);
-    setToken(null);
     readChainState();
   }, [readChainState]);
 
-  /* resolve the stock token: check deployed-tokens.json first, fallback to getLogs */
+  /* if not in deployed-tokens.json, query on-chain TokenDeployed events as fallback */
   useEffect(() => {
-    const staticToken = (deployedTokens as Record<string, string>)[symbol];
-    if (staticToken) {
-      setToken(staticToken);
-      return;
-    }
-    if (!publicClient) return;
+    if (staticToken || !publicClient) return;
     let alive = true;
     (async () => {
       try {
@@ -205,16 +223,16 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
           .map((l) => l.args as { symbol?: string; token?: string })
           .filter((a) => a.symbol === symbol && a.token);
         if (alive && matches.length > 0) {
-          setToken(matches[matches.length - 1].token!);
+          setDiscoveredToken(matches[matches.length - 1].token!);
         }
       } catch {
-        /* unresolved; the advanced field covers it */
+        /* unresolved */
       }
     })();
     return () => {
       alive = false;
     };
-  }, [publicClient, symbol]);
+  }, [publicClient, symbol, staticToken]);
 
   const onChain = isConnected && chainId === baseSepolia.id && !!address;
 
@@ -222,12 +240,9 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
     if (!onChain || !address || !publicClient) return;
     setError(null);
 
-    const resolvedToken = (tokenInput.trim() || token) as `0x${string}` | null;
+    const resolvedToken = token;
     if (!resolvedToken || resolvedToken.length !== 42) {
-      setError(
-        "No stock token address is set. Deploy one from the testnet app, then paste its address under Advanced."
-      );
-      setShowAdvanced(true);
+      setError(`No stock token address is deployed for ${symbol}.`);
       return;
     }
     if (!Number.isFinite(qtyNum) || qtyNum <= 0) {
@@ -278,17 +293,42 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
     }
   };
 
+  const handleApprove = async () => {
+    if (!onChain || !address || !publicClient || !paymentToken) return;
+    setError(null);
+    setApproving(true);
+    try {
+      const hash = await writeContractAsync({
+        address: paymentToken,
+        abi: ERC20_ABI,
+        functionName: "approve",
+        args: [TREASURY_ADDRESS, maxUint256],
+      });
+      await publicClient.waitForTransactionReceipt({ hash });
+      await readChainState();
+    } catch (e: any) {
+      setError(e?.shortMessage || e?.message || "Approval transaction failed.");
+    } finally {
+      setApproving(false);
+    }
+  };
+
   const busy =
-    phase.kind === "quoting" || phase.kind === "wallet" || phase.kind === "settling";
+    approving ||
+    phase.kind === "quoting" ||
+    phase.kind === "wallet" ||
+    phase.kind === "settling";
 
   const phaseLine =
-    phase.kind === "quoting"
-      ? "Requesting the signed quote..."
-      : phase.kind === "wallet"
-        ? "Confirm in the wallet..."
-        : phase.kind === "settling"
-          ? "Settling on-chain..."
-          : null;
+    approving
+      ? `Approving ${rail} in wallet...`
+      : phase.kind === "quoting"
+        ? "Requesting the signed quote..."
+        : phase.kind === "wallet"
+          ? "Confirm in the wallet..."
+          : phase.kind === "settling"
+            ? "Settling on-chain..."
+            : null;
 
   const num = (v: number, dp = 2) =>
     v.toLocaleString("en-US", { minimumFractionDigits: dp, maximumFractionDigits: 6 });
@@ -434,7 +474,7 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
             ) : tokenInput ? (
               "set manually"
             ) : (
-              "not found in recent deployments"
+              "not found in deployments"
             )}
           </p>
 
@@ -465,14 +505,30 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
             </p>
           )}
 
-          <button
-            type="button"
-            onClick={settle}
-            disabled={busy}
-            className="mt-5 w-full rounded-control bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep disabled:opacity-60 dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-          >
-            {action === "buy" ? "Sign quote and buy" : "Sign quote and sell"}
-          </button>
+          {needsApproval ? (
+            <>
+              <p className="mt-4 text-xs text-ink-soft dark:text-night-ink-soft">
+                Step 1 of 2: Authorize the Treasury to pull {rail} for settlement.
+              </p>
+              <button
+                type="button"
+                onClick={handleApprove}
+                disabled={busy}
+                className="mt-2 w-full rounded-control bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep disabled:opacity-60 dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+              >
+                {approving ? `Approving ${rail}...` : `Approve ${rail} for Treasury`}
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={settle}
+              disabled={busy}
+              className="mt-5 w-full rounded-control bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep disabled:opacity-60 dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+            >
+              {action === "buy" ? "Sign quote and buy" : "Sign quote and sell"}
+            </button>
+          )}
 
           {phase.kind === "done" && (
             <p className="t-figs mt-4 text-xs leading-relaxed text-ink dark:text-night-ink">
@@ -497,13 +553,9 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
           Switch to Base Sepolia
         </button>
       ) : (
-        <button
-          type="button"
-          onClick={() => connect({ connector: connectors[0] })}
-          className="mt-5 w-full rounded-control bg-accent px-6 py-3 text-sm font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-        >
-          Connect wallet to trade
-        </button>
+        <div className="mt-5 flex justify-center [&_button]:!w-full [&_button]:!justify-center">
+          <ConnectButton label="Connect wallet to trade" />
+        </div>
       )}
 
       <p className="mt-5 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
@@ -517,11 +569,5 @@ function Panel({ symbol, pricePkr }: { symbol: string; pricePkr: number }) {
 }
 
 export function TradePanel(props: { symbol: string; pricePkr: number }) {
-  return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <Panel {...props} />
-      </QueryClientProvider>
-    </WagmiProvider>
-  );
+  return <Panel {...props} />;
 }

@@ -47,6 +47,11 @@ contract DeployScript is Script {
 
             whitelist.setWhitelist(address(treasury), true);
             whitelist.setWhitelist(deployerAddress, true);
+
+            // Allow SPKR and USDC as payment tokens
+            treasury.setAllowedPaymentToken(address(spkr), true);
+            address usdc = vm.envOr("BASE_SEPOLIA_USDC", address(0x036CbD53842c5426634e7929541eC2318f3dCF7e));
+            treasury.setAllowedPaymentToken(usdc, true);
         }
 
         // 4. Deploy all 100 KSE-100 Stock Tokens in 20 Batches (5 tokens each, ~10.4M gas/batch)

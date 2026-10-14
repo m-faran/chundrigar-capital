@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { outfit, jbmono } from "./fonts";
 import "./globals.css";
 import "./taste.css";
+import { Web3Provider } from "./web3-provider";
 
 export const metadata: Metadata = {
   title: "Chundrigar Capital — PSX equities, settled on-chain",
@@ -25,7 +26,9 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <Web3Provider>{children}</Web3Provider>
+      </body>
     </html>
   );
 }
