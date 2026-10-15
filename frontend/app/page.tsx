@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { outfit, jbmono } from "./fonts";
 import { TasteHeader } from "./nav";
 import Ticker from "./ticker";
@@ -198,6 +199,40 @@ export default function TasteLanding() {
           </div>
         </section>
 
+        {/* ————— architectural heritage: I.I. Chundrigar Road & PSX ————— */}
+        <section className="border-t border-line py-16 dark:border-night-line md:py-24">
+          <h2 className="text-3xl font-semibold tracking-tight text-ink dark:text-night-ink md:text-4xl">
+            From I.I. Chundrigar Road to on-chain liquidity
+          </h2>
+
+          <div className="mt-10 overflow-hidden rounded-surface border border-line bg-surface p-2 shadow-[0_1px_2px_rgba(23,24,28,0.06),0_12px_32px_rgba(23,24,28,0.08)] sm:p-4 dark:border-night-line dark:bg-night-surface dark:shadow-[0_1px_2px_rgba(0,0,0,0.4),0_12px_32px_rgba(0,0,0,0.35)]">
+            <div className="relative aspect-[1024/571] w-full overflow-hidden rounded-control bg-paper dark:bg-night">
+              <Image
+                src="/images/psx-scene-light.png"
+                alt="Pakistan Stock Exchange and I.I. Chundrigar Road architectural engraving"
+                fill
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="object-cover dark:hidden"
+              />
+              <Image
+                src="/images/psx-scene-dark.png"
+                alt="Pakistan Stock Exchange and I.I. Chundrigar Road architectural engraving"
+                fill
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="hidden object-cover dark:block"
+              />
+            </div>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-ink-soft dark:text-night-ink-soft">
+              <span className="t-figs text-[11px] tracking-wide">
+                KARACHI · 24.8532° N, 67.0006° E
+              </span>
+              <span className="t-figs text-[11px] font-medium tracking-wider uppercase">
+                Pakistan Stock Exchange &amp; Financial District
+              </span>
+            </div>
+          </div>
+        </section>
+
         {/* ————— close: one CTA, one line ————— */}
         <section className="border-t border-line py-16 dark:border-night-line md:py-24">
           <div className="flex flex-wrap items-center justify-between gap-6 md:flex-nowrap">
@@ -218,9 +253,27 @@ export default function TasteLanding() {
       <footer className="border-t border-line dark:border-night-line">
         <div className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
-            <p className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
-              Chundrigar Capital
-            </p>
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
+                <Image
+                  src="/images/chundrigar-emblem.png"
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 object-contain dark:hidden"
+                />
+                <Image
+                  src="/images/chundrigar-emblem-dark.png"
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="hidden h-6 w-6 object-contain dark:block"
+                />
+              </span>
+              <p className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
+                Chundrigar Capital
+              </p>
+            </div>
             <div className="flex flex-wrap items-center gap-4">
               <span className="t-figs text-[11px] text-ink-soft dark:text-night-ink-soft">
                 Base Sepolia · TESTNET
@@ -235,10 +288,7 @@ export default function TasteLanding() {
           </div>
           <p className="mt-6 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
             Testnet software. Tokens represent simulated inventory during the
-            MVP. Nothing here offers returns, yields, dividends, or
-            appreciation, and nothing here claims a license or regulatory
-            approval. Chundrigar Capital is the protocol; tokens issued on it
-            carry their own names.
+            MVP. Nothing here claims a license or regulatory approval.
           </p>
         </div>
       </footer>

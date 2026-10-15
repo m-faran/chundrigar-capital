@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -41,9 +42,27 @@ export function TasteHeader() {
       <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-3 px-5 md:gap-6 md:px-8">
         <Link
           href="/"
-          className="inline-flex min-h-[44px] items-center text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink"
+          className="group inline-flex min-h-[44px] items-center gap-2.5 text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink"
         >
-          Chundrigar Capital
+          <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+            <Image
+              src="/images/chundrigar-emblem.png"
+              alt="Chundrigar Capital emblem"
+              width={32}
+              height={32}
+              className="h-8 w-8 object-contain transition-transform group-hover:scale-105 dark:hidden"
+              priority
+            />
+            <Image
+              src="/images/chundrigar-emblem-dark.png"
+              alt="Chundrigar Capital emblem"
+              width={32}
+              height={32}
+              className="hidden h-8 w-8 object-contain transition-transform group-hover:scale-105 dark:block"
+              priority
+            />
+          </span>
+          <span>Chundrigar Capital</span>
         </Link>
 
         {/* Desktop Navigation */}
