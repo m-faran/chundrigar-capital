@@ -107,7 +107,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
             className={`rounded-control px-2.5 py-1.5 transition-colors ${
               sortOrder === "default"
                 ? "bg-ink font-medium text-paper dark:bg-night-ink dark:text-night"
-                : "text-ink-soft hover:bg-accent-wash hover:text-ink dark:text-night-ink-soft dark:hover:bg-night-wash dark:hover:text-night-ink"
+                : "bg-transparent text-ink-soft hover:bg-accent-wash hover:text-ink dark:text-night-ink-soft dark:hover:bg-night-wash dark:hover:text-night-ink"
             }`}
           >
             Weight
@@ -118,7 +118,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
             className={`rounded-control px-2.5 py-1.5 transition-colors ${
               sortOrder === "gainers"
                 ? "bg-emerald-600 font-medium text-white dark:bg-emerald-500"
-                : "text-ink-soft hover:bg-emerald-50 hover:text-emerald-700 dark:text-night-ink-soft dark:hover:bg-emerald-950/40 dark:hover:text-emerald-300"
+                : "bg-transparent text-ink-soft hover:bg-emerald-50 hover:text-emerald-700 dark:text-night-ink-soft dark:hover:bg-emerald-950/40 dark:hover:text-emerald-300"
             }`}
           >
             Gainers
@@ -129,7 +129,7 @@ export function MarketsClient({ members }: { members: Member[] }) {
             className={`rounded-control px-2.5 py-1.5 transition-colors ${
               sortOrder === "losers"
                 ? "bg-rose-600 font-medium text-white dark:bg-rose-500"
-                : "text-ink-soft hover:bg-rose-50 hover:text-rose-700 dark:text-night-ink-soft dark:hover:bg-rose-950/40 dark:hover:text-rose-300"
+                : "bg-transparent text-ink-soft hover:bg-rose-50 hover:text-rose-700 dark:text-night-ink-soft dark:hover:bg-rose-950/40 dark:hover:text-rose-300"
             }`}
           >
             Losers
