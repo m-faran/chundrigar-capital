@@ -28,7 +28,7 @@ To get started, users follow these steps:
   - `Treasury.sol`: Token factory and primary counterparty that validates oracle signatures, prevents nonce replays, routes a 50 bps protocol fee, and executes atomic mints and burns.
 - **Streamlined Web3 Integration:** Built using React, Tailwind CSS, RainbowKit, and wagmi/viem for frictionless wallet connectivity (MetaMask, Rainbow, Coinbase Wallet, WalletConnect) and instant Light/Dark mode responsiveness.
 
-## ONE LIMITATION
+## SOME LIMITATIONS
 - Not production ready.
 - The KYC page is mocked.
 - There is no Market Maker the Treasury acts as a Market Maker itself.
@@ -41,7 +41,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+Open [http://localhost:3000](http://localhost:3000) to view the application. Or you can just try stuff here [https://chundrigar-capital.vercel.app/](https://chundrigar-capital.vercel.app/).
 
 ### Smart Contracts (Foundry)
 
