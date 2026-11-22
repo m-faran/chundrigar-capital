@@ -109,13 +109,8 @@ export function TasteHeader() {
           )}
         </nav>
 
-        {/* Status pill (desktop) */}
-        <span className="t-figs ml-auto hidden rounded-control border border-line px-2.5 py-1 text-[11px] text-ink-soft dark:border-night-line dark:text-night-ink-soft lg:inline-block">
-          Base Sepolia · TESTNET
-        </span>
-
         {/* Theme toggle */}
-        <div className="ml-auto md:ml-0">
+        <div className="ml-auto">
           <ThemeToggle />
         </div>
 

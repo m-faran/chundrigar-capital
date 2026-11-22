@@ -3,7 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { outfit, jbmono } from "./fonts";
 import { TasteHeader } from "./nav";
-import Ticker from "./ticker";
+import {
+  HeroPreviewSwitcher,
+  HeroSection,
+  resolveHeroVariant,
+} from "./hero-variants";
 import "./taste.css";
 
 export const metadata: Metadata = {
@@ -69,7 +73,13 @@ const TRUST = [
   },
 ];
 
-export default function TasteLanding() {
+export default async function TasteLanding({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const variant = resolveHeroVariant(await searchParams);
+
   return (
     <div className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}>
       <a href="#t-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper dark:focus:bg-night-ink dark:focus:text-night">
@@ -80,49 +90,10 @@ export default function TasteLanding() {
       <TasteHeader />
 
       <main id="t-main" className="mx-auto max-w-[1280px] px-5 md:px-8">
-        {/* ————— hero: asymmetric split 7/5, real live data as proof ————— */}
-        <section className="grid gap-12 py-16 md:grid-cols-12 md:gap-10 md:py-24 lg:grid-cols-12">
-          <div className="md:col-span-7 lg:self-center">
-            <h1 className="text-5xl font-semibold tracking-tight">
-              Own PSX shares as tokens, from anywhere.
-            </h1>
-            <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-ink-soft dark:text-night-ink-soft">
-              KSE-100 names like OGDC and Engro, issued as tokens on Base
-              Sepolia. Pay in rupees or USDC — tokens mint straight to your
-              wallet.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="/markets"
-                className="rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-              >
-                Explore markets
-              </Link>
-              <a
-                href="#t-how"
-                className="rounded-control border border-line px-6 py-3 font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
-              >
-                See how it works
-              </a>
-            </div>
-          </div>
-
-          {/* the visual: live market data, not a mockup */}
-          <div className="md:col-span-5">
-            <div className="rounded-surface border border-line bg-surface p-6 shadow-[0_1px_2px_rgba(23,24,28,0.06),0_12px_32px_rgba(23,24,28,0.08)] dark:border-night-line dark:bg-night-surface dark:shadow-[0_1px_2px_rgba(0,0,0,0.4),0_12px_32px_rgba(0,0,0,0.35)]">
-              <p className="mb-5 border-b border-line pb-4 text-sm font-medium text-ink dark:border-night-line dark:text-night-ink">
-                The market, live right now
-              </p>
-              <Ticker />
-            </div>
-            <p className="mt-3 text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
-              Live KSE 100 quotes, refreshed from the exchange feed.
-            </p>
-          </div>
-        </section>
+        <HeroSection variant={variant} />
 
         {/* ————— how it works: three user-side steps with actionable links ————— */}
-        <section id="t-how" className="border-t border-line py-16 dark:border-night-line md:py-24">
+        <section id="t-how" className="py-16 md:py-24">
           <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight md:text-4xl">
             Three steps to your first token
           </h2>
@@ -199,40 +170,6 @@ export default function TasteLanding() {
           </div>
         </section>
 
-        {/* ————— architectural heritage: I.I. Chundrigar Road & PSX ————— */}
-        <section className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight text-ink dark:text-night-ink md:text-4xl">
-            From I.I. Chundrigar Road to on-chain liquidity
-          </h2>
-
-          <div className="mt-10 overflow-hidden rounded-surface border border-line bg-surface p-2 shadow-[0_1px_2px_rgba(23,24,28,0.06),0_12px_32px_rgba(23,24,28,0.08)] sm:p-4 dark:border-night-line dark:bg-night-surface dark:shadow-[0_1px_2px_rgba(0,0,0,0.4),0_12px_32px_rgba(0,0,0,0.35)]">
-            <div className="relative aspect-[1024/571] w-full overflow-hidden rounded-control bg-paper dark:bg-night">
-              <Image
-                src="/images/psx-scene-light.png"
-                alt="Pakistan Stock Exchange and I.I. Chundrigar Road architectural engraving"
-                fill
-                sizes="(max-width: 1280px) 100vw, 1280px"
-                className="object-cover dark:hidden"
-              />
-              <Image
-                src="/images/psx-scene-dark.png"
-                alt="Pakistan Stock Exchange and I.I. Chundrigar Road architectural engraving"
-                fill
-                sizes="(max-width: 1280px) 100vw, 1280px"
-                className="hidden object-cover dark:block"
-              />
-            </div>
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1 text-xs text-ink-soft dark:text-night-ink-soft">
-              <span className="t-figs text-[11px] tracking-wide">
-                KARACHI · 24.8532° N, 67.0006° E
-              </span>
-              <span className="t-figs text-[11px] font-medium tracking-wider uppercase">
-                Pakistan Stock Exchange &amp; Financial District
-              </span>
-            </div>
-          </div>
-        </section>
-
         {/* ————— close: one CTA, one line ————— */}
         <section className="border-t border-line py-16 dark:border-night-line md:py-24">
           <div className="flex flex-wrap items-center justify-between gap-6 md:flex-nowrap">
@@ -249,49 +186,158 @@ export default function TasteLanding() {
         </section>
       </main>
 
-      {/* ————— footer ————— */}
-      <footer className="border-t border-line dark:border-night-line">
-        <div className="mx-auto max-w-[1280px] px-5 py-10 md:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
-                <Image
-                  src="/images/chundrigar-emblem.png"
-                  alt=""
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 object-contain dark:hidden"
-                />
-                <Image
-                  src="/images/chundrigar-emblem-dark.png"
-                  alt=""
-                  width={24}
-                  height={24}
-                  className="hidden h-6 w-6 object-contain dark:block"
-                />
-              </span>
-              <p className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
-                Chundrigar Capital
+      {/* ————— full-bleed architectural footer ————— */}
+      <footer className="relative overflow-hidden border-t border-line bg-[#f8f7f3] dark:border-night-line dark:bg-[#101113]">
+        <div className="relative z-10 mx-auto max-w-[1280px] px-5 pt-14 pb-4 md:px-8 md:pt-20 md:pb-6">
+          <div className="grid gap-10 md:grid-cols-12 md:gap-8">
+            <div className="md:col-span-5">
+              <div className="flex items-center gap-2.5">
+                <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
+                  <Image
+                    src="/images/chundrigar-emblem.png"
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="h-6 w-6 object-contain dark:hidden"
+                  />
+                  <Image
+                    src="/images/chundrigar-emblem-dark.png"
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="hidden h-6 w-6 object-contain dark:block"
+                  />
+                </span>
+                <p className="text-[15px] font-semibold tracking-tight text-ink dark:text-night-ink">
+                  Chundrigar Capital
+                </p>
+              </div>
+              <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
+                From I.I. Chundrigar Road to on-chain liquidity.
+              </p>
+              <p className="mt-4 max-w-[46ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
+                Testnet software. Tokens represent simulated inventory during
+                the MVP. Nothing here claims a license or regulatory approval.
+              </p>
+              <p className="t-figs mt-5 text-[11px] uppercase tracking-wider text-ink-soft dark:text-night-ink-soft">
+                Base Sepolia · TESTNET
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="t-figs text-[11px] text-ink-soft dark:text-night-ink-soft">
-                Base Sepolia · TESTNET
-              </span>
-              <Link
-                href="/markets"
-                className="text-sm font-medium text-accent underline-offset-4 hover:underline dark:text-accent-bright"
-              >
-                Explore markets
-              </Link>
+
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-7">
+              <div>
+                <h2 className="text-sm font-medium tracking-tight text-ink dark:text-night-ink">
+                  Platform
+                </h2>
+                <ul className="mt-3 grid list-none gap-1 p-0 text-sm">
+                  <li>
+                    <Link
+                      href="/"
+                      className="inline-flex min-h-[36px] items-center text-ink-soft transition-colors hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
+                    >
+                      Overview
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/markets"
+                      className="inline-flex min-h-[36px] items-center text-ink-soft transition-colors hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
+                    >
+                      Markets
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/kyc"
+                      className="inline-flex min-h-[36px] items-center text-ink-soft transition-colors hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
+                    >
+                      Verify identity
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-sm font-medium tracking-tight text-ink dark:text-night-ink">
+                  Guide
+                </h2>
+                <ul className="mt-3 grid list-none gap-1 p-0 text-sm">
+                  <li>
+                    <a
+                      href="#t-how"
+                      className="inline-flex min-h-[36px] items-center text-ink-soft transition-colors hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
+                    >
+                      How it works
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#t-rails"
+                      className="inline-flex min-h-[36px] items-center text-ink-soft transition-colors hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
+                    >
+                      Payment rails
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="#t-trust"
+                      className="inline-flex min-h-[36px] items-center text-ink-soft transition-colors hover:text-ink dark:text-night-ink-soft dark:hover:text-night-ink"
+                    >
+                      Trust &amp; safety
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="col-span-2 sm:col-span-1">
+                <h2 className="text-sm font-medium tracking-tight text-ink dark:text-night-ink">
+                  Location
+                </h2>
+                <div className="mt-3 grid gap-2 text-sm text-ink-soft dark:text-night-ink-soft">
+                  <p>Pakistan Stock Exchange</p>
+                  <p>I.I. Chundrigar Road</p>
+                  <p>Karachi, Pakistan</p>
+                  <p className="t-figs pt-1 text-[11px] tracking-wide">
+                    24.8532° N, 67.0006° E
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-          <p className="mt-6 max-w-[50ch] text-xs leading-relaxed text-ink-soft dark:text-night-ink-soft">
-            Testnet software. Tokens represent simulated inventory during the
-            MVP. Nothing here claims a license or regulatory approval.
-          </p>
+        </div>
+
+        <div className="relative mx-auto w-full max-w-[1600px] md:-mt-4">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-[#f8f7f3] to-transparent dark:from-[#101113]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-16 bg-gradient-to-r from-[#f8f7f3] to-transparent dark:from-[#101113] min-[1600px]:block"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-16 bg-gradient-to-l from-[#f8f7f3] to-transparent dark:from-[#101113] min-[1600px]:block"
+          />
+          <Image
+            src="/images/psx-footer-light.jpg"
+            alt="Pakistan Stock Exchange and I.I. Chundrigar Road architectural engraving"
+            width={1376}
+            height={768}
+            sizes="(max-width: 1600px) 100vw, 1600px"
+            className="block h-auto w-full dark:hidden"
+          />
+          <Image
+            src="/images/psx-footer-dark.jpg"
+            alt="Pakistan Stock Exchange and I.I. Chundrigar Road architectural engraving"
+            width={1376}
+            height={768}
+            sizes="(max-width: 1600px) 100vw, 1600px"
+            className="hidden h-auto w-full dark:block"
+          />
         </div>
       </footer>
+      <HeroPreviewSwitcher active={variant} />
     </div>
   );
 }
