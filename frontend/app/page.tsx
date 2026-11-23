@@ -3,11 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { outfit, jbmono } from "./fonts";
 import { TasteHeader } from "./nav";
-import {
-  HeroPreviewSwitcher,
-  HeroSection,
-  resolveHeroVariant,
-} from "./hero-variants";
 import "./taste.css";
 
 export const metadata: Metadata = {
@@ -73,13 +68,7 @@ const TRUST = [
   },
 ];
 
-export default async function TasteLanding({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const variant = resolveHeroVariant(await searchParams);
-
+export default function TasteLanding() {
   return (
     <div className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}>
       <a href="#t-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper dark:focus:bg-night-ink dark:focus:text-night">
@@ -90,7 +79,71 @@ export default async function TasteLanding({
       <TasteHeader />
 
       <main id="t-main" className="mx-auto max-w-[1280px] px-5 md:px-8">
-        <HeroSection variant={variant} />
+        {/* ————— hero: CHUNDRIGAR / CAPITAL framing the classical marble bust ————— */}
+        <section className="pt-8 pb-16 md:pt-12 md:pb-24">
+          <div className="relative mx-auto flex max-w-[1160px] flex-col items-center">
+            <p
+              aria-hidden="true"
+              className="pointer-events-none select-none text-center text-[13.5vw] font-semibold uppercase leading-[0.84] tracking-[-0.045em] text-ink dark:text-night-ink xl:text-[176px]"
+            >
+              CHUNDRIGAR
+            </p>
+
+            <div className="relative z-10 mx-auto -mt-[6.5vw] w-[240px] sm:w-[300px] md:-mt-[92px] md:w-[350px] lg:-mt-[112px] lg:w-[380px]">
+              <Image
+                src="/images/hero-marble-cobalt-light.png"
+                alt="Classical marble bust with cobalt toga, carved neoclassical columns, and Mughal geometric latticework"
+                width={532}
+                height={684}
+                priority
+                sizes="(max-width: 768px) 300px, 380px"
+                className="block h-auto w-full dark:hidden"
+              />
+              <Image
+                src="/images/hero-marble-cobalt-dark.png"
+                alt="Classical marble bust with cobalt toga, carved neoclassical columns, and Mughal geometric latticework"
+                width={532}
+                height={684}
+                priority
+                sizes="(max-width: 768px) 300px, 380px"
+                className="hidden h-auto w-full dark:block"
+              />
+            </div>
+
+            <p
+              aria-hidden="true"
+              className="pointer-events-none relative z-0 -mt-[11vw] select-none text-center text-[13.5vw] font-semibold uppercase leading-[0.84] tracking-[0.14em] text-ink dark:text-night-ink sm:-mt-[90px] md:-mt-[112px] lg:-mt-[126px] xl:text-[176px]"
+            >
+              CAPITAL
+            </p>
+          </div>
+
+          <div className="mx-auto mt-10 flex max-w-[62ch] flex-col items-center text-center md:mt-12">
+            <h1 className="max-w-[24ch] text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[42px] lg:leading-[1.1]">
+              Trade the Pakistan Stock Exchange from your crypto wallet
+            </h1>
+
+            <p className="mt-4 max-w-[50ch] text-base leading-relaxed text-ink-soft dark:text-night-ink-soft sm:text-lg">
+              Skip brokerage paperwork — verify your CNIC once and trade PSX
+              shares.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/kyc"
+                className="rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+              >
+                Verify wallet
+              </Link>
+              <Link
+                href="/markets"
+                className="rounded-control border border-line px-6 py-3 font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
+              >
+                Explore markets
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* ————— how it works: three user-side steps with actionable links ————— */}
         <section id="t-how" className="py-16 md:py-24">
@@ -337,7 +390,6 @@ export default async function TasteLanding({
           />
         </div>
       </footer>
-      <HeroPreviewSwitcher active={variant} />
     </div>
   );
 }
