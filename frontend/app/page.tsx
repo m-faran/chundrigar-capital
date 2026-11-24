@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { outfit, jbmono } from "./fonts";
 import { TasteHeader } from "./nav";
+import { LandingV2Sections } from "./landing-v2";
 import "./taste.css";
 
 export const metadata: Metadata = {
@@ -21,53 +22,6 @@ export const viewport: Viewport = {
   ],
 };
 
-const STEPS = [
-  {
-    name: "Verify once",
-    body: "Upload an ID for a quick human review. Your wallet joins the whitelist — no repeat checks after that.",
-    href: "/kyc",
-    cta: "Verify identity →",
-  },
-  {
-    name: "Pick a stock, pay your way",
-    body: "Choose any KSE-100 name and pay in PKR or USDC. You see the exact price before you confirm.",
-    href: "/markets",
-    cta: "Browse KSE-100 →",
-  },
-  {
-    name: "Tokens land in your wallet",
-    body: "Shares mint to your wallet at the quoted price. Sell them back the same way, any time.",
-    href: "/markets",
-    cta: "Start trading →",
-  },
-];
-
-const RAILS = [
-  {
-    title: "In Pakistan: pay in PKR",
-    body: "The rupee rail prices the market natively — no currency conversion on your trade.",
-  },
-  {
-    title: "Abroad: pay in USDC",
-    body: "Your dollars convert at trade time, inside the signed price — not yesterday's rate.",
-  },
-];
-
-const TRUST = [
-  {
-    title: "Signed prices, verified on-chain",
-    body: "Every quote is signed off-chain and checked by the contract. Nothing else settles.",
-  },
-  {
-    title: "Whitelist-gated, always",
-    body: "The token checks approval on every single transfer — in and out.",
-  },
-  {
-    title: "0.50% fee, no middlemen",
-    body: "The Treasury is your direct counterparty. One printed fee, nothing hidden.",
-  },
-];
-
 export default function TasteLanding() {
   return (
     <div className={`t-root ${outfit.variable} ${jbmono.variable} bg-paper text-ink dark:bg-night dark:text-night-ink`}>
@@ -78,165 +32,85 @@ export default function TasteLanding() {
       {/* ————— responsive shared nav with mobile drawer ————— */}
       <TasteHeader />
 
-      <main id="t-main" className="mx-auto max-w-[1280px] px-5 md:px-8">
+      <main id="t-main" className="w-full">
         {/* ————— hero: CHUNDRIGAR / CAPITAL framing the classical marble bust ————— */}
-        <section className="pt-8 pb-16 md:pt-12 md:pb-24">
-          <div className="relative mx-auto flex max-w-[1160px] flex-col items-center">
-            <p
-              aria-hidden="true"
-              className="pointer-events-none select-none text-center text-[13.5vw] font-semibold uppercase leading-[0.84] tracking-[-0.045em] text-ink dark:text-night-ink xl:text-[176px]"
-            >
-              CHUNDRIGAR
-            </p>
+        <section className="relative overflow-hidden pt-8 pb-16 md:pt-12 md:pb-24">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_52%_at_50%_34%,rgba(33,72,192,0.28),rgba(147,168,255,0.22)_42%,rgba(238,241,252,0.45)_62%,transparent_80%)] dark:bg-[radial-gradient(ellipse_62%_54%_at_50%_34%,rgba(147,168,255,0.16),rgba(22,48,127,0.18)_45%,transparent_76%)]"
+          />
 
-            <div className="relative z-10 mx-auto -mt-[6.5vw] w-[240px] sm:w-[300px] md:-mt-[92px] md:w-[350px] lg:-mt-[112px] lg:w-[380px]">
-              <Image
-                src="/images/hero-marble-cobalt-light.png"
-                alt="Classical marble bust with cobalt toga, carved neoclassical columns, and Mughal geometric latticework"
-                width={532}
-                height={684}
-                priority
-                sizes="(max-width: 768px) 300px, 380px"
-                className="block h-auto w-full dark:hidden"
-              />
-              <Image
-                src="/images/hero-marble-cobalt-dark.png"
-                alt="Classical marble bust with cobalt toga, carved neoclassical columns, and Mughal geometric latticework"
-                width={532}
-                height={684}
-                priority
-                sizes="(max-width: 768px) 300px, 380px"
-                className="hidden h-auto w-full dark:block"
-              />
+          <div className="relative z-10 mx-auto max-w-[1280px] px-5 md:px-8">
+            <div className="relative mx-auto flex max-w-[1160px] flex-col items-center">
+              <p
+                aria-hidden="true"
+                className="pointer-events-none select-none text-center text-[13.5vw] font-semibold uppercase leading-[0.84] tracking-[-0.045em] text-ink dark:text-night-ink xl:text-[176px]"
+              >
+                CHUNDRIGAR
+              </p>
+
+              <div className="relative z-10 mx-auto -mt-[6.5vw] w-[240px] sm:w-[300px] md:-mt-[92px] md:w-[350px] lg:-mt-[112px] lg:w-[380px]">
+                <Image
+                  src="/images/hero-marble-cobalt-light.png"
+                  alt="Classical marble bust with cobalt toga, carved neoclassical columns, and Mughal geometric latticework"
+                  width={532}
+                  height={684}
+                  priority
+                  sizes="(max-width: 768px) 300px, 380px"
+                  className="block h-auto w-full dark:hidden"
+                />
+                <Image
+                  src="/images/hero-marble-cobalt-dark.png"
+                  alt="Classical marble bust with cobalt toga, carved neoclassical columns, and Mughal geometric latticework"
+                  width={532}
+                  height={684}
+                  priority
+                  sizes="(max-width: 768px) 300px, 380px"
+                  className="hidden h-auto w-full dark:block"
+                />
+              </div>
+
+              <p
+                aria-hidden="true"
+                className="pointer-events-none relative z-0 -mt-[11vw] select-none text-center text-[13.5vw] font-semibold uppercase leading-[0.84] tracking-[0.14em] text-ink dark:text-night-ink sm:-mt-[90px] md:-mt-[112px] lg:-mt-[126px] xl:text-[176px]"
+              >
+                CAPITAL
+              </p>
             </div>
 
-            <p
-              aria-hidden="true"
-              className="pointer-events-none relative z-0 -mt-[11vw] select-none text-center text-[13.5vw] font-semibold uppercase leading-[0.84] tracking-[0.14em] text-ink dark:text-night-ink sm:-mt-[90px] md:-mt-[112px] lg:-mt-[126px] xl:text-[176px]"
-            >
-              CAPITAL
-            </p>
-          </div>
+            <div className="mx-auto mt-10 flex max-w-[62ch] flex-col items-center text-center md:mt-12">
+              <h1 className="max-w-[24ch] text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[42px] lg:leading-[1.1]">
+                Trade the{" "}
+                <span className="text-accent dark:text-accent-bright">
+                  Pakistan Stock Exchange
+                </span>{" "}
+                from your crypto wallet
+              </h1>
 
-          <div className="mx-auto mt-10 flex max-w-[62ch] flex-col items-center text-center md:mt-12">
-            <h1 className="max-w-[24ch] text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[42px] lg:leading-[1.1]">
-              Trade the Pakistan Stock Exchange from your crypto wallet
-            </h1>
+              <p className="mt-4 max-w-[50ch] text-base leading-relaxed text-ink-soft dark:text-night-ink-soft sm:text-lg">
+                Skip brokerage paperwork — verify your CNIC once and trade PSX
+                shares.
+              </p>
 
-            <p className="mt-4 max-w-[50ch] text-base leading-relaxed text-ink-soft dark:text-night-ink-soft sm:text-lg">
-              Skip brokerage paperwork — verify your CNIC once and trade PSX
-              shares.
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/kyc"
-                className="rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-              >
-                Verify wallet
-              </Link>
-              <Link
-                href="/markets"
-                className="rounded-control border border-line px-6 py-3 font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
-              >
-                Explore markets
-              </Link>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <Link
+                  href="/kyc"
+                  className="rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
+                >
+                  Verify wallet
+                </Link>
+                <Link
+                  href="/markets"
+                  className="rounded-control border border-line px-6 py-3 font-medium text-ink transition-colors hover:border-ink-soft dark:border-night-line dark:text-night-ink dark:hover:border-night-ink-soft"
+                >
+                  Explore markets
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ————— how it works: three user-side steps with actionable links ————— */}
-        <section id="t-how" className="py-16 md:py-24">
-          <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight md:text-4xl">
-            Three steps to your first token
-          </h2>
-          <p className="mt-3 max-w-[60ch] text-ink-soft dark:text-night-ink-soft">
-            From ID check to settled trade in one sitting.
-          </p>
-
-          <ol className="mt-10 grid list-none gap-10 p-0 md:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <li key={s.name} className="flex flex-col border-t-2 border-ink pt-5 dark:border-night-ink">
-                <span className="t-figs text-xs text-accent dark:text-accent-bright">
-                  0{i + 1}
-                </span>
-                <h3 className="mt-2 text-lg font-medium tracking-tight text-ink dark:text-night-ink">
-                  {s.name}
-                </h3>
-                <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                  {s.body}
-                </p>
-                <div className="mt-4 pt-2">
-                  <Link
-                    href={s.href}
-                    className="inline-flex min-h-[44px] items-center text-sm font-medium text-accent underline-offset-4 hover:underline dark:text-accent-bright"
-                  >
-                    {s.cta}
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* ————— rails: pay at home or from abroad ————— */}
-        <section id="t-rails" className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <h2 className="max-w-[24ch] text-3xl font-semibold tracking-tight md:text-4xl">
-            Pay the way that suits you
-          </h2>
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
-            {RAILS.map((r) => (
-              <div
-                key={r.title}
-                className="rounded-surface border border-line bg-surface p-6 md:p-8 dark:border-night-line dark:bg-night-surface"
-              >
-                <h3 className="text-xl font-medium tracking-tight text-ink dark:text-night-ink">
-                  {r.title}
-                </h3>
-                <p className="mt-3 max-w-[52ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                  {r.body}
-                </p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 max-w-[60ch] text-sm text-ink-soft dark:text-night-ink-soft">
-            Both rails settle at the same price, at the same 0.50% fee.
-          </p>
-        </section>
-
-        {/* ————— trust: three promises, no lecture ————— */}
-        <section id="t-trust" className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <h2 className="max-w-[22ch] text-3xl font-semibold tracking-tight md:text-4xl">
-            Built like an exchange, not a promise
-          </h2>
-          <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
-            {TRUST.map((t, i) => (
-              <div key={t.title} className={i > 0 ? "md:border-l md:border-line md:pl-8 dark:md:border-night-line" : ""}>
-                <h3 className="text-lg font-medium tracking-tight text-ink dark:text-night-ink">
-                  {t.title}
-                </h3>
-                <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-ink-soft dark:text-night-ink-soft">
-                  {t.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ————— close: one CTA, one line ————— */}
-        <section className="border-t border-line py-16 dark:border-night-line md:py-24">
-          <div className="flex flex-wrap items-center justify-between gap-6 md:flex-nowrap">
-            <h2 className="max-w-[20ch] text-3xl font-semibold tracking-tight md:text-4xl">
-              The testnet is live. Try a trade.
-            </h2>
-            <Link
-              href="/markets"
-              className="shrink-0 whitespace-nowrap rounded-control bg-accent px-6 py-3 font-medium text-cta-text transition-colors hover:bg-accent-deep dark:bg-accent-bright dark:text-night dark:hover:bg-cta-text dark:hover:text-accent-deep"
-            >
-              Explore markets
-            </Link>
-          </div>
-        </section>
+        <LandingV2Sections />
       </main>
 
       {/* ————— full-bleed architectural footer ————— */}
